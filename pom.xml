@@ -1,16 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>me.sgray.template</groupId>
-    <artifactId>SpigotPlugin</artifactId>
+    <groupId>lar.minecraft.hg</groupId>
+    <artifactId>LAR-Minecraft-Hunger-Games</artifactId>
     <!-- Version is used in plugin.yml -->
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <!-- Plugin Information -->
     <!-- Name, Description, and URL are used in plugin.yml -->
-    <name>SpigotPlugin</name>
+    <name>LARMinecraft-HG</name>
     <description>Example of a Spigot plugin using Maven</description>
-    <url>http://sgray.me/project/spigotplugin</url>
 
     <licenses>
         <license>
@@ -39,16 +38,20 @@
     </licenses>
 
     <developers>
+    	<developer>
+                <name>Luca Acquafredda</name>
+                <url>https://lucaacquafredda.altervista.org/</url>
+        </developer>
         <developer>
-                <name>Shaila Gray</name>
-                <url>http://sgray.me</url>
+                <name>Alberto Rutigliano</name>
+                <url>https://albertorutigliano.altervista.org/</url>
         </developer>
     </developers>
 
     <properties>
         <!--  Author and MainClass are used in plugin.yml -->
         <author>SGray</author>
-        <mainClass>me.sgray.template.spigotplugin.SpigotPlugin</mainClass>
+        <mainClass>lar.minecraft.hg.SpigotPlugin</mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -56,7 +59,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
+            <version>1.19.4-R0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

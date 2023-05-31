@@ -1,4 +1,4 @@
-package me.sgray.template.spigotplugin;
+package lar.minecraft.hg;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
