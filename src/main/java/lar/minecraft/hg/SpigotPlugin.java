@@ -1,8 +1,17 @@
 package lar.minecraft.hg;
 
+import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpigotPlugin extends JavaPlugin {
+	
+	public static Server server;
+	
+	@Override
+    public void onLoad() {
+		server = getServer();
+    }
+	
     @Override
     public void onDisable() {
         // Don't log disabling, Spigot does that for you automatically!
@@ -13,6 +22,9 @@ public class SpigotPlugin extends JavaPlugin {
         // Don't log enabling, Spigot does that for you automatically!
 
         // Commands enabled with following method must have entries in plugin.yml
-        getCommand("example").setExecutor(new ExampleCommand(this));
+        getCommand("lobby").setExecutor(new ExampleCommand(this));
+        getCommand("nolobby").setExecutor(new ExampleCommand(this));
+        getCommand("bowman").setExecutor(new ClassCommand(this));
+        getCommand("armored").setExecutor(new ClassCommand(this));
     }
 }
