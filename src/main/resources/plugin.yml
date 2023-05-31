@@ -7,9 +7,24 @@ website: ${url}
 main: ${mainClass}
 
 commands:
-    example:
+    lobby:
         description: An example command
-        permission: spigotplugin.example
+        permission: spigotplugin.lobby
         usage: /<command>
-
-permissions: {}
+    nolobby:
+        description: An example command
+        permission: spigotplugin.nolobby
+        usage: /<command>
+    bowman:
+        description: An example command
+        permission: perm.general
+        usage: /<command>
+    armored:
+        description: An example command
+        permission: perm.general
+        usage: /<command>
+permissions:
+   perm.general:
+      default: true
+   perm.op:
+      default: op
