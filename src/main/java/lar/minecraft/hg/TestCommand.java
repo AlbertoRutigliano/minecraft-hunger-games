@@ -6,10 +6,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ExampleCommand implements CommandExecutor {
+public class TestCommand implements CommandExecutor {
     SpigotPlugin plugin;
 
-    public ExampleCommand(SpigotPlugin plugin) {
+    public TestCommand(SpigotPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -29,6 +29,11 @@ public class ExampleCommand implements CommandExecutor {
         	for (Player p : SpigotPlugin.server.getOnlinePlayers()) {
         		p.setGameMode(GameMode.SURVIVAL);
         	}
+        }
+        
+        if (cmdName.equals("start-hg")) {
+        	sender.sendMessage("Starting counter");
+        	ServerSchedulers.initGameStartCounter();
         }
 
         return true;
