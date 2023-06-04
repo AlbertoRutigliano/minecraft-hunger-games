@@ -22,9 +22,13 @@ public class SpigotPlugin extends JavaPlugin {
         // Don't log enabling, Spigot does that for you automatically!
 
         // Commands enabled with following method must have entries in plugin.yml
-        getCommand("lobby").setExecutor(new ExampleCommand(this));
-        getCommand("nolobby").setExecutor(new ExampleCommand(this));
+        getCommand("lobby").setExecutor(new TestCommand(this));
+        getCommand("nolobby").setExecutor(new TestCommand(this));
+        getCommand("start-hg").setExecutor(new TestCommand(this));
+        
         getCommand("bowman").setExecutor(new ClassCommand(this));
         getCommand("armored").setExecutor(new ClassCommand(this));
+        
+       
     }
 }
