@@ -15,6 +15,10 @@ commands:
         description: An example command
         permission: spigotplugin.nolobby
         usage: /<command>
+    start-hg:
+        description: An example command
+        permission: spigotplugin.start
+        usage: /<command>
     bowman:
         description: An example command
         permission: perm.general
