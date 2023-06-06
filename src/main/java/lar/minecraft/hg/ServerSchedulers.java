@@ -1,9 +1,9 @@
 package lar.minecraft.hg;
 
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -48,7 +48,12 @@ public class ServerSchedulers {
 	public static void initSafeArea() {
 		safeAreaTime = 0;
 		SpigotPlugin.server.broadcastMessage("It's starting the Hunger Games!");
-		SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.teleport(new Location(SpigotPlugin.server.getWorld("world"), 0, 128, 0)));
+		SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.teleport(SpigotPlugin.server.getWorld("world").getSpawnLocation()));
+		
+		// Create world border
+		SpigotPlugin.server.getWorld("world").getWorldBorder().setCenter(SpigotPlugin.server.getWorld("world").getSpawnLocation());
+		SpigotPlugin.server.getWorld("world").getWorldBorder().setSize(256);
+		
 		safeAreaTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
 				long execTime = SpigotPlugin.server.getWorld("world").getTime();
@@ -76,14 +81,12 @@ public class ServerSchedulers {
 		winnerCelebrationsTime = 0;
 		winnerCelebrationsTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
-				if (SpigotPlugin.server.getOnlinePlayers().size() == 1) {
+				if (ServerManager.getLivingPlayers().size() == 1) {
 					// First runnable run
 					long execTime = SpigotPlugin.server.getWorld("world").getTime();
 					if(winnerCelebrationsTime == 0) {
 						Player winner = SpigotPlugin.server.getOnlinePlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " win the Hunger Games!");
-						
-						//TODO Add fireworks effects and give prizes
 						winnerCelebrationsTime = execTime + (20 * WINNER_CELEBRATIONS_COUNTER_SECONDS);
 					}
 					long passedSeconds = (execTime - winnerCelebrationsTime) / 20;
