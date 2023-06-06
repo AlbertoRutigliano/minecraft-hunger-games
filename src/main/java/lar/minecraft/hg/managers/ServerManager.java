@@ -2,6 +2,7 @@ package lar.minecraft.hg.managers;
 
 import java.util.ArrayList;
 
+import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -24,7 +25,7 @@ public class ServerManager {
 	public static ArrayList<Player> getLivingPlayers() {
 		ArrayList<Player> livingPlayers = new ArrayList<>();
 		for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
-			if(!p.isDead()) {
+			if(!p.isDead() && !p.getGameMode().equals(GameMode.SPECTATOR)) {
 				livingPlayers.add(p);
 			}
 		}

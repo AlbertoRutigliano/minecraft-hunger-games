@@ -98,7 +98,7 @@ public class ServerSchedulers {
 					}
 					if (passedSeconds == 0) {
 						SpigotPlugin.server.broadcastMessage("Starting a new Hunger Games");
-						initGameStartCounter();
+						// initGameStartCounter(); TODO Paused for testing
 						SpigotPlugin.server.getScheduler().cancelTask(winnerCelebrationsTaskId);
 					}
 				}	
