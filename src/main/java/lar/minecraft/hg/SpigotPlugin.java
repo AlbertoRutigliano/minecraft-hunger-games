@@ -3,6 +3,8 @@ package lar.minecraft.hg;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import lar.minecraft.hg.managers.PlayerManager;
+
 public class SpigotPlugin extends JavaPlugin {
 	
 	public static Server server;
@@ -30,6 +32,7 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("armored").setExecutor(new ClassCommand(this));
         
         getServer().getPluginManager().registerEvents(new FireworksEffect(this), this);
+        server.getPluginManager().registerEvents(new PlayerManager(), this);
        
     }
 }
