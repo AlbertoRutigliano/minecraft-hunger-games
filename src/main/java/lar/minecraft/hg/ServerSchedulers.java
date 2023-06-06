@@ -64,7 +64,7 @@ public class ServerSchedulers {
 				if (passedSeconds == 0) {
 					SpigotPlugin.server.broadcastMessage("It's Hunger Games tiiiiiiiiime!");
 					SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.setGameMode(GameMode.SURVIVAL));
-					lastPlayerVictory();
+					// lastPlayerVictory();
 					SpigotPlugin.server.getScheduler().cancelTask(safeAreaTaskId);
 				}
 				

@@ -29,6 +29,7 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("bowman").setExecutor(new ClassCommand(this));
         getCommand("armored").setExecutor(new ClassCommand(this));
         
+        getServer().getPluginManager().registerEvents(new FireworksEffect(this), this);
        
     }
 }
