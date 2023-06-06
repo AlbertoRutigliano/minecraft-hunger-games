@@ -3,6 +3,8 @@ package lar.minecraft.hg;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import lar.minecraft.hg.managers.PlayerManager;
+
 public class SpigotPlugin extends JavaPlugin {
 	
 	public static Server server;
@@ -28,7 +30,8 @@ public class SpigotPlugin extends JavaPlugin {
         
         getCommand("bowman").setExecutor(new ClassCommand(this));
         getCommand("armored").setExecutor(new ClassCommand(this));
-        
+
+		server.getPluginManager().registerEvents(new PlayerManager(), this);
        
     }
 }
