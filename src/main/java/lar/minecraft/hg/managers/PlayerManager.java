@@ -4,9 +4,12 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import lar.minecraft.hg.ServerSchedulers;
+import lar.minecraft.hg.SpigotPlugin;
 
 public class PlayerManager implements Listener {
 
@@ -29,8 +32,35 @@ public class PlayerManager implements Listener {
 		}*/
 		
 		// Fireworks effect
-		if (ServerManager.getLivingPlayers().size() == 1) {
+		/*if (ServerManager.getLivingPlayers().size() == 1) {
 			ServerSchedulers.lastPlayerVictory();
+		}*/
+	}
+	
+	/**
+	 * Player quit event
+	 */
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event){
+		ServerManager.SendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+
+		// Fireworks effect
+		/*if (ServerManager.getLivingPlayers().size() == 1) {
+			ServerSchedulers.lastPlayerVictory();
+		}*/
+	}
+	
+	@EventHandler
+	public void onPlayerDamage(EntityDamageEvent event) {
+		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPluginLoading()) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerDamage(EntityShootBowEvent event) {
+		if (SpigotPlugin.isLobby() || SpigotPlugin.isPluginLoading()) {
+			event.setCancelled(true);
 		}
 	}
 	
