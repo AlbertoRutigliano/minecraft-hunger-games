@@ -9,6 +9,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import lar.minecraft.hg.managers.QueryManager;
 import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -108,6 +109,7 @@ public class ServerSchedulers {
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * WINNER_CELEBRATIONS_COUNTER_SECONDS);
+						QueryManager.addPlayerWin(winner);
 						fireworkEffect(winner);
 					}
 					
