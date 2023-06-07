@@ -2,8 +2,8 @@ package lar.minecraft.hg;
 
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
 import org.bukkit.FireworkEffect.Type;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -30,6 +30,7 @@ public class ServerSchedulers {
 	private final static int FIREWORKS_EFFECTS_COUNTER_SECONDS = 20;
 	
 	public static void initGameStartCounter() {
+		SpigotPlugin.setPhase(HGPhase.LOBBY);
 		gameStartTime = 0;
 		gameStartTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
@@ -37,7 +38,11 @@ public class ServerSchedulers {
 				// First runnable run
 				if (gameStartTime == 0) {
 					gameStartTime = execTime + (20 * GAME_START_COUNTER_SECONDS); // Game will start in 10 seconds
-					SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.setGameMode(GameMode.ADVENTURE));
+					ServerManager.getLivingPlayers().forEach(p -> {
+						p.setGameMode(GameMode.ADVENTURE);
+						p.getInventory().clear();
+						// p.getInventory().addItem(new ItemStack(Material.COMPASS));
+					});
 				}
 				long passedSeconds = (execTime - gameStartTime) / 20;
 				for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
@@ -54,6 +59,7 @@ public class ServerSchedulers {
 	}
 	
 	public static void initSafeArea() {
+		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
 		safeAreaTime = 0;
 		SpigotPlugin.server.broadcastMessage("It's starting the Hunger Games!");
 		SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.teleport(SpigotPlugin.server.getWorld("world").getSpawnLocation()));
@@ -77,7 +83,8 @@ public class ServerSchedulers {
 				if (passedSeconds == 0) {
 					SpigotPlugin.server.broadcastMessage("It's Hunger Games tiiiiiiiiime!");
 					SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.setGameMode(GameMode.SURVIVAL));
-					// lastPlayerVictory();
+					SpigotPlugin.setPhase(HGPhase.PLAYING);
+					lastPlayerVictory();
 					SpigotPlugin.server.getScheduler().cancelTask(safeAreaTaskId);
 				}
 				
@@ -93,6 +100,7 @@ public class ServerSchedulers {
 					// First runnable run
 					long execTime = SpigotPlugin.server.getWorld("world").getTime();
 					if(winnerCelebrationsTime == 0) {
+						SpigotPlugin.setPhase(HGPhase.WINNING);
 						Player winner = SpigotPlugin.server.getOnlinePlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " win the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", "Prizes: blah blah", 10, 70, 20);
@@ -115,6 +123,14 @@ public class ServerSchedulers {
 				}	
 			}
 		}, 20, 20); // 1 second = 20 ticks
+	}
+	
+	public static void initPhaseLogger() {
+		SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+			public void run() {
+				SpigotPlugin.server.getLogger().info("Phase: " + SpigotPlugin.getPhase().toString());
+			}
+		}, 20, 100); // 1 second = 20 ticks
 	}
 	
 	private static void fireworkEffect(Player winner) {
