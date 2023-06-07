@@ -1,7 +1,12 @@
 package lar.minecraft.hg;
 
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
+import org.bukkit.FireworkEffect.Type;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.FireworkMeta;
 
 import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
@@ -12,14 +17,17 @@ public class ServerSchedulers {
 	private static long gameStartTime = 0;
 	private static long safeAreaTime = 0;
 	private static long winnerCelebrationsTime = 0;
+	private static long fireworksEffectsTime = 0;
 	
 	private static int gameStartTaskId = -1;
 	private static int safeAreaTaskId = -1;
 	private static int winnerCelebrationsTaskId = -1;
+	private static int fireworksEffectsTaskId = -1;
 	
 	private final static int GAME_START_COUNTER_SECONDS = 10;
 	private final static int SAFE_AREA_COUNTER_SECONDS = 20;
 	private final static int WINNER_CELEBRATIONS_COUNTER_SECONDS = 30;
+	private final static int FIREWORKS_EFFECTS_COUNTER_SECONDS = 20;
 	
 	public static void initGameStartCounter() {
 		gameStartTime = 0;
@@ -87,8 +95,11 @@ public class ServerSchedulers {
 					if(winnerCelebrationsTime == 0) {
 						Player winner = SpigotPlugin.server.getOnlinePlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " win the Hunger Games!");
+						winner.sendTitle("You win the Hunger Games!", "Prizes: blah blah", 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * WINNER_CELEBRATIONS_COUNTER_SECONDS);
+						fireworkEffect(winner);
 					}
+					
 					long passedSeconds = (execTime - winnerCelebrationsTime) / 20;
 					
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
@@ -104,5 +115,32 @@ public class ServerSchedulers {
 				}	
 			}
 		}, 20, 20); // 1 second = 20 ticks
+	}
+	
+	private static void fireworkEffect(Player winner) {
+		fireworksEffectsTime = 0;
+		fireworksEffectsTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+			@Override
+			public void run() {
+				long execTime = SpigotPlugin.server.getWorld("world").getTime();
+				if (fireworksEffectsTime == 0) {
+					fireworksEffectsTime = execTime + (20 * FIREWORKS_EFFECTS_COUNTER_SECONDS);
+				}
+				long passedSeconds = (execTime - fireworksEffectsTime) / 20;
+				
+				if (passedSeconds % 4 == 0) {
+					Firework firework = winner.getWorld().spawn(winner.getLocation(), Firework.class);
+					FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
+					data.addEffects(FireworkEffect.builder().withColor(Color.PURPLE).withColor(Color.GREEN).with(Type.BALL_LARGE).withFlicker().build());
+					data.setPower(1);
+					firework.setFireworkMeta(data);
+				}
+				
+				if (passedSeconds == 0) {
+					SpigotPlugin.server.getScheduler().cancelTask(fireworksEffectsTaskId);
+				}
+			}
+			
+		}, 20, 20); // 1 second = 20 ticks	
 	}
 }
