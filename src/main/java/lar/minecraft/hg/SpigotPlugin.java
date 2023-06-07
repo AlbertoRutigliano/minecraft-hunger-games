@@ -32,9 +32,13 @@ public class SpigotPlugin extends JavaPlugin {
     public void onEnable() {
         // Don't log enabling, Spigot does that for you automatically!
     	
-    	phase = HGPhase.PLUGIN_LOADING;
+    	phase = HGPhase.WAITING_FOR_HG;
     	
     	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); //TODO For test purpose
+    	
+    	// Create world border
+		SpigotPlugin.server.getWorld("world").getWorldBorder().setCenter(SpigotPlugin.server.getWorld("world").getSpawnLocation());
+		SpigotPlugin.server.getWorld("world").getWorldBorder().setSize(128);
     	
         // Commands enabled with following method must have entries in plugin.yml
         getCommand("lobby").setExecutor(new TestCommand(this));
@@ -43,10 +47,12 @@ public class SpigotPlugin extends JavaPlugin {
         
         getCommand("bowman").setExecutor(new ClassCommand());
         getCommand("armored").setExecutor(new ClassCommand());
+        getCommand("doglover").setExecutor(new ClassCommand());
         
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
         
         ServerSchedulers.initPhaseLogger();
+        //ServerSchedulers.initGameStartCounter();
        
     }
     
@@ -70,8 +76,8 @@ public class SpigotPlugin extends JavaPlugin {
     	return phase.equals(HGPhase.WINNING);
     }
     
-    public static boolean isPluginLoading() {
-    	return phase.equals(HGPhase.PLUGIN_LOADING);
+    public static boolean isWaitingForStart() {
+    	return phase.equals(HGPhase.WAITING_FOR_HG);
     }
     
     public static boolean isPlaying() {

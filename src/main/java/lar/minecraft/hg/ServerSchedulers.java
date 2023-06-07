@@ -4,6 +4,7 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -24,9 +25,9 @@ public class ServerSchedulers {
 	private static int winnerCelebrationsTaskId = -1;
 	private static int fireworksEffectsTaskId = -1;
 	
-	private final static int GAME_START_COUNTER_SECONDS = 10;
+	private final static int GAME_START_COUNTER_SECONDS = 20;
 	private final static int SAFE_AREA_COUNTER_SECONDS = 20;
-	private final static int WINNER_CELEBRATIONS_COUNTER_SECONDS = 30;
+	private final static int WINNER_CELEBRATIONS_COUNTER_SECONDS = 20;
 	private final static int FIREWORKS_EFFECTS_COUNTER_SECONDS = 20;
 	
 	public static void initGameStartCounter() {
@@ -61,14 +62,13 @@ public class ServerSchedulers {
 	public static void initSafeArea() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
 		safeAreaTime = 0;
-		SpigotPlugin.server.broadcastMessage("It's starting the Hunger Games!");
-		SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.teleport(SpigotPlugin.server.getWorld("world").getSpawnLocation()));
-		
+		ServerManager.getLivingPlayers().forEach(p -> {
+			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("It's starting the Hunger Games!"));
+			p.setGameMode(GameMode.SURVIVAL);
+			p.teleport(SpigotPlugin.server.getWorld("world").getSpawnLocation());
+		});
 		ServerManager.giveClasses();
-		
-		// Create world border
-		SpigotPlugin.server.getWorld("world").getWorldBorder().setCenter(SpigotPlugin.server.getWorld("world").getSpawnLocation());
-		SpigotPlugin.server.getWorld("world").getWorldBorder().setSize(256);
+		ServerManager.sendSound(Sound.EVENT_RAID_HORN);
 		
 		safeAreaTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
@@ -83,8 +83,9 @@ public class ServerSchedulers {
 						ChatMessageType.ACTION_BAR, 
 						TextComponent.fromLegacyText("Safe area expire in " + Math.abs(passedSeconds) + " seconds")));
 				if (passedSeconds == 0) {
-					SpigotPlugin.server.broadcastMessage("It's Hunger Games tiiiiiiiiime!");
-					ServerManager.getLivingPlayers().forEach(p -> p.setGameMode(GameMode.SURVIVAL));
+					ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
+							ChatMessageType.ACTION_BAR, 
+							TextComponent.fromLegacyText("It's Hunger Games tiiiiiiiiime!")));
 					SpigotPlugin.setPhase(HGPhase.PLAYING);
 					lastPlayerVictory();
 					SpigotPlugin.server.getScheduler().cancelTask(safeAreaTaskId);
@@ -104,8 +105,8 @@ public class ServerSchedulers {
 					if(winnerCelebrationsTime == 0) {
 						SpigotPlugin.setPhase(HGPhase.WINNING);
 						Player winner = ServerManager.getLivingPlayers().iterator().next();
-						SpigotPlugin.server.broadcastMessage(winner.getName() + " win the Hunger Games!");
-						winner.sendTitle("You win the Hunger Games!", "Prizes: blah blah", 10, 70, 20);
+						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
+						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * WINNER_CELEBRATIONS_COUNTER_SECONDS);
 						fireworkEffect(winner);
 					}
@@ -115,11 +116,13 @@ public class ServerSchedulers {
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 						p.spigot().sendMessage(
 								ChatMessageType.ACTION_BAR, 
-								TextComponent.fromLegacyText("Another Hunger Games will start in " + Math.abs(passedSeconds) + " seconds"));
+								TextComponent.fromLegacyText("A new Hunger Games will start in " + Math.abs(passedSeconds) + " seconds. Server will be restarted"));
 					}
 					if (passedSeconds == 0) {
-						SpigotPlugin.server.broadcastMessage("Starting a new Hunger Games");
+						SpigotPlugin.server.broadcastMessage("Starting a new Hunger Games Server");
 						// initGameStartCounter(); TODO Paused for testing
+						SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+						SpigotPlugin.server.shutdown();
 						SpigotPlugin.server.getScheduler().cancelTask(winnerCelebrationsTaskId);
 					}
 				}	

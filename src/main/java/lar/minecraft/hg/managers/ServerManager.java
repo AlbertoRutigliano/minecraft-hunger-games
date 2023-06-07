@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -20,7 +21,7 @@ public class ServerManager {
 	 */
 	public static void sendSound(Sound sound) {
 		for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
-			p.playSound(p.getLocation(), sound, 1.0f, 1.0f);
+			p.playSound(p, sound, 10.0f, 1.0f);
 		}
 	}
 
@@ -51,6 +52,13 @@ public class ServerManager {
 						playerInventory.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
 						playerInventory.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
 						playerInventory.setBoots(new ItemStack(Material.IRON_BOOTS));
+						break;
+					case "doglover":
+						playerInventory.addItem(new ItemStack(Material.BONE, 8));
+						Wolf dog = SpigotPlugin.server.getWorld("world").spawn(player.getLocation(), Wolf.class);
+						dog.setOwner(player);
+						dog.setAdult();
+						dog.setSitting(false);
 						break;
 					default:
 						break;

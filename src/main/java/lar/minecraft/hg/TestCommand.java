@@ -32,7 +32,6 @@ public class TestCommand implements CommandExecutor {
         }
         
         if (cmdName.equals("start-hg")) {
-        	sender.sendMessage("Starting counter");
         	ServerSchedulers.initGameStartCounter();
         }
 

@@ -27,6 +27,10 @@ commands:
         description: An example command
         permission: perm.general
         usage: /<command>
+    doglover:
+        description: An example command
+        permission: perm.general
+        usage: /<command>
 permissions:
    perm.general:
       default: true

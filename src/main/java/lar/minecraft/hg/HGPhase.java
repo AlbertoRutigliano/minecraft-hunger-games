@@ -1,7 +1,7 @@
 package lar.minecraft.hg;
 
 public enum HGPhase {
-	PLUGIN_LOADING,
+	WAITING_FOR_HG,
 	LOBBY,
 	SAFE_AREA,
 	PLAYING,
