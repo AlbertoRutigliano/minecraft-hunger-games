@@ -58,7 +58,7 @@ public class PlayerManager implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerDamage(EntityShootBowEvent event) {
+	public void onPlayerShootBow(EntityShootBowEvent event) {
 		if (SpigotPlugin.isLobby() || SpigotPlugin.isPluginLoading()) {
 			event.setCancelled(true);
 		}
