@@ -1,7 +1,11 @@
 package lar.minecraft.hg;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Difficulty;
 import org.bukkit.Server;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import lar.minecraft.hg.managers.PlayerManager;
@@ -11,6 +15,8 @@ public class SpigotPlugin extends JavaPlugin {
 	public static Server server;
 	
 	public static HGPhase phase;
+	
+	public static Map<Player, PlayerExt> playerExtension = new HashMap<>();
 	
 	@Override
     public void onLoad() {

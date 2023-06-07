@@ -1,5 +1,6 @@
 package lar.minecraft.hg.managers;
 
+import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -7,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import lar.minecraft.hg.SpigotPlugin;
@@ -18,7 +20,7 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event){
-		ServerManager.SendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		
 		Player deathPlayer = event.getEntity().getPlayer();
 		deathPlayer.kickPlayer("Si muert");
@@ -42,7 +44,7 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
-		ServerManager.SendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 
 		// Fireworks effect
 		/*if (ServerManager.getLivingPlayers().size() == 1) {
@@ -52,15 +54,24 @@ public class PlayerManager implements Listener {
 	
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent event) {
-		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPluginLoading()) {
+		/*if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPluginLoading()) {
+			event.setCancelled(true);
+		}*/
+	}
+	
+	@Deprecated
+	@EventHandler
+	public void onPlayerShootBow(EntityShootBowEvent event) {
+		if (SpigotPlugin.isLobby() || SpigotPlugin.isPluginLoading()) {
 			event.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
-	public void onPlayerShootBow(EntityShootBowEvent event) {
-		if (SpigotPlugin.isLobby() || SpigotPlugin.isPluginLoading()) {
-			event.setCancelled(true);
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
+			event.setJoinMessage(null);
+			event.getPlayer().setGameMode(GameMode.SPECTATOR);
 		}
 	}
 	
