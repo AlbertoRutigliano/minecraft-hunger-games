@@ -64,6 +64,8 @@ public class ServerSchedulers {
 		SpigotPlugin.server.broadcastMessage("It's starting the Hunger Games!");
 		SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.teleport(SpigotPlugin.server.getWorld("world").getSpawnLocation()));
 		
+		ServerManager.giveClasses();
+		
 		// Create world border
 		SpigotPlugin.server.getWorld("world").getWorldBorder().setCenter(SpigotPlugin.server.getWorld("world").getSpawnLocation());
 		SpigotPlugin.server.getWorld("world").getWorldBorder().setSize(256);
@@ -77,12 +79,12 @@ public class ServerSchedulers {
 				}
 				long passedSeconds = (execTime - safeAreaTime) / 20;
 
-				SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.spigot().sendMessage(
+				ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
 						ChatMessageType.ACTION_BAR, 
 						TextComponent.fromLegacyText("Safe area expire in " + Math.abs(passedSeconds) + " seconds")));
 				if (passedSeconds == 0) {
 					SpigotPlugin.server.broadcastMessage("It's Hunger Games tiiiiiiiiime!");
-					SpigotPlugin.server.getOnlinePlayers().forEach(p -> p.setGameMode(GameMode.SURVIVAL));
+					ServerManager.getLivingPlayers().forEach(p -> p.setGameMode(GameMode.SURVIVAL));
 					SpigotPlugin.setPhase(HGPhase.PLAYING);
 					lastPlayerVictory();
 					SpigotPlugin.server.getScheduler().cancelTask(safeAreaTaskId);
@@ -101,7 +103,7 @@ public class ServerSchedulers {
 					long execTime = SpigotPlugin.server.getWorld("world").getTime();
 					if(winnerCelebrationsTime == 0) {
 						SpigotPlugin.setPhase(HGPhase.WINNING);
-						Player winner = SpigotPlugin.server.getOnlinePlayers().iterator().next();
+						Player winner = ServerManager.getLivingPlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " win the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", "Prizes: blah blah", 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * WINNER_CELEBRATIONS_COUNTER_SECONDS);
