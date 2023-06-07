@@ -3,6 +3,7 @@ package lar.minecraft.hg;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import lar.minecraft.hg.managers.QueryManager;
 import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -88,6 +89,8 @@ public class ServerSchedulers {
 						Player winner = SpigotPlugin.server.getOnlinePlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " win the Hunger Games!");
 						winnerCelebrationsTime = execTime + (20 * WINNER_CELEBRATIONS_COUNTER_SECONDS);
+
+						QueryManager.addPlayerWin(winner);
 					}
 					long passedSeconds = (execTime - winnerCelebrationsTime) / 20;
 					
