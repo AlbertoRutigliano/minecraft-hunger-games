@@ -1,7 +1,6 @@
 package lar.minecraft.hg.managers;
-import java.lang.reflect.Field;
 import java.sql.*;
-import lar.minecraft.hg.dbModels.imodel;
+import org.bukkit.entity.Player;
 
 public class DatabaseManager {
 	
@@ -10,7 +9,7 @@ public class DatabaseManager {
 	private static String databasePassword = "4E3M4dYSlP9g2yC#";
 	private static Connection dbConnection;
 	
-	private static void connectToDatabase() throws SQLException, ClassNotFoundException {
+	public static void connectToDatabase() throws SQLException, ClassNotFoundException {
 		if (dbConnection != null) {
 			if (!dbConnection.isClosed()) {
 				return;
@@ -21,146 +20,99 @@ public class DatabaseManager {
 		dbConnection = DriverManager.getConnection(connectionString, databaseUser, databasePassword);
 	}
 	
-	private static void disconnectToDatabase() throws SQLException, ClassNotFoundException {
+	public static void disconnectToDatabase() throws SQLException, ClassNotFoundException {
 		if (dbConnection != null) {
 			if (!dbConnection.isClosed()) {
 				dbConnection.close();				
 			}
 		}
 	}
-
-	public static int ExecuteRead(String table, String whereCondition) throws SQLException, ClassNotFoundException {
-		connectToDatabase();
-		int count = 0;
-
-		Statement statement = dbConnection.createStatement();
-		ResultSet resultSet = statement.executeQuery(getReadQuery(table, whereCondition));
-		
-		while (resultSet.next()) {
-			count++; 
-		}
-		disconnectToDatabase();
-        return count;
-	}
 	
-	public static void ExecuteInsert(String table, imodel model) throws SQLException, ClassNotFoundException {
-		connectToDatabase();
-
-		Statement statement = dbConnection.createStatement();
+	/**
+	 * Save the information of the new match
+	 * @param serverId
+	 * @return the new hg game Id
+	 */
+	public static int createHGGame(int ServerId) {
 		try {
-			statement.executeUpdate(getInsertQuery(table, model));
-		} catch (IllegalArgumentException | SQLException e) {
+			connectToDatabase();
+			
+			int hgGameId = 1;
+			Statement statementRead = dbConnection.createStatement();
+			Statement statementInsert = dbConnection.createStatement();
+			ResultSet resultSet = statementRead.executeQuery(String.format("SELECT MAX(id) AS foundId FROM hg_games WHERE server_id = %d;", ServerId));
+			
+			while (resultSet.next()) {
+				int foundRows = resultSet.getInt("foundId");
+				hgGameId = foundRows + 1;
+			}
+			statementInsert.executeUpdate(String.format("INSERT INTO hg_games (server_id, id) VALUES (%d, %d);", ServerId, hgGameId));
+
+			disconnectToDatabase();
+			return hgGameId;
+		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		disconnectToDatabase();
+		return 0;
 	}
 	
-	public static void ExecuteUpdate(String table, String fieldsToChange, String whereCondition) throws SQLException, ClassNotFoundException {
-		connectToDatabase();
-
-		Statement statement = dbConnection.createStatement();
+	/**
+	 * Save the information of all players that joined the game
+	 * @param ServerId
+	 * @param HGGameId
+	 * @param player
+	 */
+	public static void addPlayerJoin(int ServerId, int HGGameId, Player player) {
 		try {
-			statement.executeUpdate(getupdatetQuery(table, fieldsToChange, whereCondition));
-		} catch (IllegalArgumentException | SQLException e) {
+			connectToDatabase();
+			
+			Statement statementRead = dbConnection.createStatement();
+			Statement statementInsert = dbConnection.createStatement();
+			
+			//Add player into players table if not existing
+			ResultSet resultSet = statementRead.executeQuery(String.format("SELECT COUNT(*) AS playerFound FROM players WHERE uuid = '%s';", player.getUniqueId().toString()));
+			while (resultSet.next()) {
+				int foundRows = resultSet.getInt("playerFound");
+				if (foundRows == 0) {
+					statementInsert.executeUpdate(String.format("INSERT INTO players (uuid, name) VALUES ('%s', '%s');", player.getUniqueId(), player.getName()));
+				}
+			}
+
+			//Add player into played hg games if not existing
+			resultSet = statementRead.executeQuery(String.format("SELECT COUNT(*) AS playerFound FROM played_hg_games WHERE server_id = %d AND id = %d AND player_uuid = '%s';", ServerId, HGGameId, player.getUniqueId().toString()));			
+			while (resultSet.next()) {
+				int foundRows = resultSet.getInt("playerFound");
+				if (foundRows == 0) {
+					statementInsert.executeUpdate(String.format("INSERT INTO played_hg_games (server_id, id, player_uuid) VALUES ('%d', '%d', '%s');", ServerId, HGGameId, player.getUniqueId(), player.getName()));
+				}
+			}
+			
+			disconnectToDatabase();
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		disconnectToDatabase();
 	}
 	
 	/**
-	 * Retrieve read query
-	 * @param model of the object to read
-	 * @return string for read
+	 * Save the information of the player that won the match
+	 * @param ServerId
+	 * @param HGGameId
+	 * @param player the winner
 	 */
-	public static String getReadQuery(String table, String whereCondition) {
-		if (table == null) {
-			throw new NullPointerException();
-		}
-		
-		String query = "SELECT * FROM " + table;
-		if (whereCondition != null) {
-			query = query + " WHERE " + whereCondition;
-		}
-		
-		return query;
-	}
-	
-	/**
-	 * Retrieve insert query
-	 * @param model of the object to insert
-	 * @return string for insert
-	 */
-	public static String getInsertQuery(String table, imodel model){
-		if (table == null) {
-			throw new NullPointerException();
-		}
-		if (model == null) {
-			throw new NullPointerException();
-		}
-		
-		Field[] fields = model.getClass().getDeclaredFields();
-		int i = 0;
+	public static void savePlayerWin(int ServerId, int HGGameId, Player player) {
+		try {
+			connectToDatabase();
+			
+			Statement statementUpdate = dbConnection.createStatement();
+			statementUpdate.executeUpdate(String.format("UPDATE hg_games SET winner_uuid = '%s', win_datetime = NOW() WHERE server_id = %d AND id = %d", player.getUniqueId().toString(), ServerId, HGGameId));
 
-		String query = "INSERT INTO " + table + " (";
-		for (Field field : fields) {
-			query = query + field.getName();
-			if( i < fields.length - 1) {
-	            query = query + ",";	
-			}
-            i++;
-        }
-		i = 0;
-		query = query + ") VALUES (";
-		for (Field field : fields) {
-			String fieldType = field.getType().toString();
-            try {
-            	
-				if(fieldType.compareToIgnoreCase("int") == 0) {
-					query = query + field.getInt(model);
-				}else {
-					if (field.get(model) == null) {
-						query = query + "null";
-					}else {
-						query = query + "'" + field.get(model).toString() + "'";
-					}
-				}
-
-    			if( i < fields.length - 1) {
-    	            query = query + ",";	
-    			}
-                i++;
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-		query = query + ");";
-		return query;
-	}
-	
-	/**
-	 * Retrieve update query
-	 * @param model of the object to change
-	 * @param fieldsToChange in SQL format
-	 * @param whereCondition in SQL format
-	 * @return string for update
-	 */
-	public static String getupdatetQuery(String table, String fieldsToChange, String whereCondition){
-		if (table == null) {
-			throw new NullPointerException();
+			disconnectToDatabase();
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		if (fieldsToChange == null) {
-			throw new NullPointerException();
-		}
-		
-		String query = "UPDATE " + table + " SET " + fieldsToChange;
-		if (whereCondition != null) {
-			query = query + " WHERE " + whereCondition;
-		}
-		query = query + ";";
-		return query;
 	}
 }
+
