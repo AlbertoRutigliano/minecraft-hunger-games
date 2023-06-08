@@ -51,9 +51,8 @@ public class SpigotPlugin extends JavaPlugin {
         
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
         
-        ServerSchedulers.initPhaseLogger();
         //ServerSchedulers.initGameStartCounter();
-       
+        
     }
     
     public static HGPhase getPhase() {

@@ -2,6 +2,7 @@ package lar.minecraft.hg.managers;
 
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -61,5 +62,27 @@ public class PlayerManager implements Listener {
 			event.getPlayer().setGameMode(GameMode.SPECTATOR);
 		}
 	}
+	
+	public static Player getNearestPlayer(Player player, double range) {
+        double distance = Double.POSITIVE_INFINITY;
+        Player target = null;
+       
+        //loop over nearby entities
+        for (Entity entity : player.getNearbyEntities(range, range, range)) {
+            //check if the entity is a player if not. we skip this loop
+            if (!(entity instanceof Player)) continue;
+            //check if the entity is myself if so. we skip this loop
+            if (entity == player) continue;
+            //store distance to the entity in variable
+            double distanceTo = player.getLocation().distance(entity.getLocation());
+           
+            //check wether our distance this loop is smaller than our saved one. if so we replace it and replace the target
+            if (distanceTo < distance) {
+                distance = distanceTo;
+                target = (Player) entity;
+            }
+        }
+        return target;
+    }
 	
 }

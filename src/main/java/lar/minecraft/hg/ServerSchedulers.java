@@ -4,11 +4,17 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import lar.minecraft.hg.managers.PlayerManager;
+import lar.minecraft.hg.managers.QueryManager;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
@@ -93,6 +99,7 @@ public class ServerSchedulers {
 							ChatMessageType.ACTION_BAR, 
 							TextComponent.fromLegacyText("It's Hunger Games tiiiiiiiiime!")));
 					SpigotPlugin.setPhase(HGPhase.PLAYING);
+					initCompassTracker();
 					lastPlayerVictory();
 					SpigotPlugin.server.getScheduler().cancelTask(safeAreaTaskId);
 				}
@@ -138,12 +145,30 @@ public class ServerSchedulers {
 		}, 20, 20); // 1 second = 20 ticks
 	}
 	
-	public static void initPhaseLogger() {
+	public static void initCompassTracker() {
 		SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
+				
 				SpigotPlugin.server.getLogger().info("Phase: " + SpigotPlugin.getPhase().toString());
+				
+				for (Player player : ServerManager.getLivingPlayers()) {
+					PlayerInventory inventory = player.getInventory();
+	                for (int i = 0; i < 36; i++) {
+	                	ItemStack item = inventory.getItem(i);
+	                	if (item != null && item.getType() != null && !item.getType().isAir() && item.getType().equals(Material.COMPASS)) {
+	                		final CompassMeta compassMeta = (CompassMeta) item.getItemMeta();	  
+	                		if (PlayerManager.getNearestPlayer(player, 200) != null) {
+	                			compassMeta.setDisplayName("Following " + PlayerManager.getNearestPlayer(player, 200).getName());
+	                		}
+                            player.getInventory().getItem(i).setItemMeta(compassMeta);
+	                	}
+	                }
+	                if (PlayerManager.getNearestPlayer(player, 200) != null) {
+                		player.setCompassTarget(PlayerManager.getNearestPlayer(player, 200).getLocation());     
+                	}
+				}
 			}
-		}, 20, 100); // 1 second = 20 ticks
+		}, 20, 20); // 1 second = 20 ticks
 	}
 	
 	private static void fireworkEffect(Player winner) {
