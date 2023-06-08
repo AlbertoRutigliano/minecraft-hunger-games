@@ -14,7 +14,6 @@ import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 
 import lar.minecraft.hg.managers.PlayerManager;
-import lar.minecraft.hg.managers.QueryManager;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
