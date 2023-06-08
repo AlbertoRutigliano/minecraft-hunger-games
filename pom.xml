@@ -22,6 +22,7 @@
     <properties>
         <author>Luca Acquafredda and Alberto Rutigliano</author>
         <mainClass>lar.minecraft.hg.SpigotPlugin</mainClass>
+        <apiVersion>1.19</apiVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
