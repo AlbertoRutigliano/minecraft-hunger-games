@@ -27,6 +27,7 @@ public class ServerSchedulers {
 	private static long safeAreaTime = 0;
 	private static long winnerCelebrationsTime = 0;
 	private static long fireworksEffectsTime = 0;
+	private static long worldBorderCollapseTime = 0;
 	
 	private static int gameStartTaskId = -1;
 	private static int safeAreaTaskId = -1;
@@ -37,6 +38,8 @@ public class ServerSchedulers {
 	private final static int SAFE_AREA_COUNTER_SECONDS = 20;
 	private final static int WINNER_CELEBRATIONS_COUNTER_SECONDS = 20;
 	private final static int FIREWORKS_EFFECTS_COUNTER_SECONDS = 20;
+	private final static int WORLD_BORDER_COLLAPSE_COUNTER_SECONDS = 60;
+	private final static int WORLD_BORDER_COLLAPSE_RADIUS = 20;
 	
 	public static void initGameStartCounter() {
 		SpigotPlugin.setPhase(HGPhase.LOBBY);
@@ -108,12 +111,28 @@ public class ServerSchedulers {
 	}
 	
 	public static void lastPlayerVictory() {
+		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
 		winnerCelebrationsTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
+				long execTime = SpigotPlugin.server.getWorld("world").getTime();
+				// First runnable run
+				if(worldBorderCollapseTime == 0) {
+					worldBorderCollapseTime = execTime + (20 * WORLD_BORDER_COLLAPSE_COUNTER_SECONDS);
+				}
+				long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
+				if(passedSecondsForWorldBorderCollapse == 0) {
+					if (SpigotPlugin.worldBorderSize > SpigotPlugin.worldBorderMinumumSize) {
+						SpigotPlugin.worldBorderSize = SpigotPlugin.worldBorderSize - WORLD_BORDER_COLLAPSE_RADIUS;
+						SpigotPlugin.server.getWorld("world").getWorldBorder().setSize(SpigotPlugin.worldBorderSize, WORLD_BORDER_COLLAPSE_COUNTER_SECONDS);
+						SpigotPlugin.server.getWorld("world").getWorldBorder().setDamageBuffer(0);
+						SpigotPlugin.server.getWorld("world").getWorldBorder().setDamageAmount(0.2);
+						worldBorderCollapseTime = 0; 
+					}
+				}
+				
 				if (ServerManager.getLivingPlayers().size() == 1) {
 					// First runnable run
-					long execTime = SpigotPlugin.server.getWorld("world").getTime();
 					if(winnerCelebrationsTime == 0) {
 						SpigotPlugin.setPhase(HGPhase.WINNING);
 						Player winner = ServerManager.getLivingPlayers().iterator().next();
