@@ -15,12 +15,15 @@ import org.bukkit.inventory.meta.FireworkMeta;
 
 import lar.minecraft.hg.managers.PlayerManager;
 import lar.minecraft.hg.managers.QueryManager;
+import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class ServerSchedulers {
 
+	private static int currentHGGameId = 0;
+	
 	private static long gameStartTime = 0;
 	private static long safeAreaTime = 0;
 	private static long winnerCelebrationsTime = 0;
@@ -68,10 +71,13 @@ public class ServerSchedulers {
 	public static void initSafeArea() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
 		safeAreaTime = 0;
+		currentHGGameId = DatabaseManager.createHGGame(1);
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("It's starting the Hunger Games!"));
 			p.setGameMode(GameMode.SURVIVAL);
 			p.teleport(SpigotPlugin.server.getWorld("world").getSpawnLocation());
+			//TODO: addPlayerJoin fix first parameter, should be the serverId coming from parameter file
+			DatabaseManager.addPlayerJoin(1, currentHGGameId, p);
 		});
 		ServerManager.giveClasses();
 		ServerManager.sendSound(Sound.EVENT_RAID_HORN);
@@ -115,7 +121,8 @@ public class ServerSchedulers {
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * WINNER_CELEBRATIONS_COUNTER_SECONDS);
-						QueryManager.addPlayerWin(winner);
+						//TODO: savePlayerWin fix first parameter, should be the serverId coming from parameter file
+						DatabaseManager.savePlayerWin(1, currentHGGameId, winner);
 						fireworkEffect(winner);
 					}
 					
