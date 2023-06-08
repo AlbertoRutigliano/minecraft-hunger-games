@@ -39,16 +39,14 @@ public class ServerManager {
 	public static void giveClasses() {
 		for(Player player : getLivingPlayers()) {
 			PlayerInventory playerInventory = player.getInventory();
-			playerInventory.setItem(0, new ItemStack(Material.COMPASS));
+			playerInventory.clear();
+			playerInventory.addItem(new ItemStack(Material.COMPASS));
 			if (SpigotPlugin.playerExtension.get(player) != null) {
 				String chosenClass = SpigotPlugin.playerExtension.get(player).getChosenClass();
-				
-				playerInventory.clear();
 				player.sendMessage("Giving " + chosenClass + " items");
 				switch (chosenClass) {
 					case "bowman":
-						playerInventory.setItem(1, new ItemStack(Material.BOW));
-						playerInventory.setItem(2, new ItemStack(Material.ARROW, 16));
+						playerInventory.addItem(new ItemStack(Material.BOW), new ItemStack(Material.ARROW, 16));
 						break;
 					case "armored":
 						playerInventory.setHelmet(new ItemStack(Material.IRON_HELMET));
@@ -57,7 +55,7 @@ public class ServerManager {
 						playerInventory.setBoots(new ItemStack(Material.IRON_BOOTS));
 						break;
 					case "doglover":
-						playerInventory.setItem(1, new ItemStack(Material.BONE, 8));
+						playerInventory.addItem(new ItemStack(Material.BONE, 8));
 						Wolf dog = SpigotPlugin.server.getWorld("world").spawn(player.getLocation(), Wolf.class);
 						dog.setOwner(player);
 						dog.setAdult();
