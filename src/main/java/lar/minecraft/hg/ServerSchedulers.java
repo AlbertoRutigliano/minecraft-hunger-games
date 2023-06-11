@@ -52,7 +52,7 @@ public class ServerSchedulers {
 	private static int fireworksEffectsTaskId = -1;
 	
 	private final static int WORLD_BORDER_COLLAPSE_COUNTER_SECONDS = 60; // TODO May be added on config.yml
-	private final static int WORLD_BORDER_COLLAPSE_RADIUS = 20; // TODO @ May be added on config.yml
+	private final static int WORLD_BORDER_COLLAPSE_RADIUS = 20; // TODO May be added on config.yml
 	
 	public void lobbyPhase() {
 		SpigotPlugin.setPhase(HGPhase.LOBBY);
