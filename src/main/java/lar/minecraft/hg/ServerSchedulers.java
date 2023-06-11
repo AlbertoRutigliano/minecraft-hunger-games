@@ -46,11 +46,10 @@ public class ServerSchedulers {
 				long execTime = SpigotPlugin.server.getWorld("world").getTime();
 				// First runnable run
 				if (gameStartTime == 0) {
-					gameStartTime = execTime + (20 * GAME_START_COUNTER_SECONDS); // Game will start in 10 seconds
+					gameStartTime = execTime + (20 * GAME_START_COUNTER_SECONDS); // Game will start in X seconds
 					ServerManager.getLivingPlayers().forEach(p -> {
 						p.setGameMode(GameMode.ADVENTURE);
 						p.getInventory().clear();
-						// p.getInventory().addItem(new ItemStack(Material.COMPASS));
 					});
 				}
 				long passedSeconds = (execTime - gameStartTime) / 20;

@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -33,11 +32,6 @@ public class PlayerManager implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
 		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-
-		// Fireworks effect
-		/*if (ServerManager.getLivingPlayers().size() == 1) {
-			ServerSchedulers.lastPlayerVictory();
-		}*/
 	}
 	
 	@EventHandler
@@ -46,15 +40,7 @@ public class PlayerManager implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
-	@Deprecated
-	@EventHandler
-	public void onPlayerShootBow(EntityShootBowEvent event) {
-		if (SpigotPlugin.isLobby() || SpigotPlugin.isWaitingForStart()) {
-			event.setCancelled(true);
-		}
-	}
-	
+		
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
@@ -67,16 +53,11 @@ public class PlayerManager implements Listener {
         double distance = Double.POSITIVE_INFINITY;
         Player target = null;
        
-        //loop over nearby entities
         for (Entity entity : player.getNearbyEntities(range, range, range)) {
-            //check if the entity is a player if not. we skip this loop
             if (!(entity instanceof Player)) continue;
-            //check if the entity is myself if so. we skip this loop
             if (entity == player) continue;
-            //store distance to the entity in variable
+            
             double distanceTo = player.getLocation().distance(entity.getLocation());
-           
-            //check wether our distance this loop is smaller than our saved one. if so we replace it and replace the target
             if (distanceTo < distance) {
                 distance = distanceTo;
                 target = (Player) entity;
