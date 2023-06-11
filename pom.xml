@@ -22,6 +22,7 @@
     <properties>
         <author>Luca Acquafredda and Alberto Rutigliano</author>
         <mainClass>lar.minecraft.hg.SpigotPlugin</mainClass>
+        <apiVersion>1.19</apiVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -31,6 +32,11 @@
             <artifactId>spigot-api</artifactId>
             <version>1.19.4-R0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+    		<groupId>mysql</groupId>
+    		<artifactId>mysql-connector-java</artifactId>
+    		<version>8.0.33</version>
+		</dependency>
     </dependencies>
 
     <repositories>

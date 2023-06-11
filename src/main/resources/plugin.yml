@@ -1,19 +1,16 @@
 name: ${name}
 version: ${version}
 description: ${description}
+api-version: ${apiVersion}
 author: ${author}
 website: ${url}
 
 main: ${mainClass}
 
 commands:
-    lobby:
+    test:
         description: An example command
-        permission: spigotplugin.lobby
-        usage: /<command>
-    nolobby:
-        description: An example command
-        permission: spigotplugin.nolobby
+        permission: spigotplugin.test
         usage: /<command>
     start-hg:
         description: An example command
@@ -24,6 +21,10 @@ commands:
         permission: perm.general
         usage: /<command>
     armored:
+        description: An example command
+        permission: perm.general
+        usage: /<command>
+    doglover:
         description: An example command
         permission: perm.general
         usage: /<command>
