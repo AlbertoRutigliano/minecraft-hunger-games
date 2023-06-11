@@ -1,0 +1,10 @@
+durations:
+ lobby: 20
+ safe-area: 20
+ winner-celebrations: 20
+ fireworks: 20
+world-border:
+ max-size: 128
+ min-size: 2
+server:
+ id: 1
