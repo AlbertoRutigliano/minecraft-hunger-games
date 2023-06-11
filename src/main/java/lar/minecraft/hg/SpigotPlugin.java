@@ -8,6 +8,8 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import lar.minecraft.hg.commands.ClassCommand;
+import lar.minecraft.hg.commands.TestCommand;
 import lar.minecraft.hg.managers.PlayerManager;
 
 public class SpigotPlugin extends JavaPlugin {

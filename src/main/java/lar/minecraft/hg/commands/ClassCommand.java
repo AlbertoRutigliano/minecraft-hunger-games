@@ -1,13 +1,15 @@
-package lar.minecraft.hg;
+package lar.minecraft.hg.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import lar.minecraft.hg.PlayerExt;
+import lar.minecraft.hg.SpigotPlugin;
 
 public class ClassCommand implements CommandExecutor {
-	
+    
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		String cmdName = command.getName().toLowerCase();
@@ -24,9 +26,6 @@ public class ClassCommand implements CommandExecutor {
 					player.sendMessage("Class selection is available only in LOBBY");
 				}
 		}
-		
-		
-		 
 		return true;
 	}
 	

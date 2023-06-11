@@ -1,8 +1,11 @@
-package lar.minecraft.hg;
+package lar.minecraft.hg.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
+import lar.minecraft.hg.ServerSchedulers;
+import lar.minecraft.hg.SpigotPlugin;
 
 public class TestCommand implements CommandExecutor {
     SpigotPlugin plugin;
