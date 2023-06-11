@@ -8,13 +8,9 @@ website: ${url}
 main: ${mainClass}
 
 commands:
-    lobby:
+    test:
         description: An example command
-        permission: spigotplugin.lobby
-        usage: /<command>
-    nolobby:
-        description: An example command
-        permission: spigotplugin.nolobby
+        permission: spigotplugin.test
         usage: /<command>
     start-hg:
         description: An example command

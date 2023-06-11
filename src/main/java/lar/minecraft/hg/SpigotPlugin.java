@@ -18,12 +18,10 @@ public class SpigotPlugin extends JavaPlugin {
 	
 	public static Map<Player, PlayerExt> playerExtension = new HashMap<>();
 	
-	public static int worldBorderSize = 128;
-	public static int worldBorderMinumumSize = 20;
-	
 	@Override
     public void onLoad() {
 		server = getServer();
+		saveDefaultConfig();
     }
 	
     @Override
@@ -40,8 +38,8 @@ public class SpigotPlugin extends JavaPlugin {
     	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); //TODO For test purpose
     	
     	// Create world border
-		SpigotPlugin.server.getWorld("world").getWorldBorder().setCenter(SpigotPlugin.server.getWorld("world").getSpawnLocation());
-		SpigotPlugin.server.getWorld("world").getWorldBorder().setSize(worldBorderSize);
+    	getServer().getWorld("world").getWorldBorder().setCenter(getServer().getWorld("world").getSpawnLocation());
+    	getServer().getWorld("world").getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
     	
         // Commands enabled with following method must have entries in plugin.yml
         getCommand("lobby").setExecutor(new TestCommand(this));

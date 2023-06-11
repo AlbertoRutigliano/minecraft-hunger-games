@@ -24,7 +24,6 @@ public class ServerManager {
 			p.playSound(p, sound, 10.0f, 1.0f);
 		}
 	}
-
 	
 	public static ArrayList<Player> getLivingPlayers() {
 		ArrayList<Player> livingPlayers = new ArrayList<>();
@@ -35,7 +34,7 @@ public class ServerManager {
 		}
 		return livingPlayers;
 	}
-	
+		
 	public static void giveClasses() {
 		for(Player player : getLivingPlayers()) {
 			PlayerInventory playerInventory = player.getInventory();
