@@ -8,6 +8,14 @@ website: ${url}
 main: ${mainClass}
 
 commands:
+    lobby:
+        description: An example command
+        permission: spigotplugin.lobby
+        usage: /<command>
+    nolobby:
+        description: An example command
+        permission: spigotplugin.nolobby
+        usage: /<command>
     test:
         description: An example command
         permission: spigotplugin.test
