@@ -16,13 +16,13 @@ commands:
         description: An example command
         permission: spigotplugin.nolobby
         usage: /<command>
-    test:
+    restart-hg-server:
         description: An example command
-        permission: spigotplugin.test
+        permission: spigotplugin.restart-hg-server
         usage: /<command>
-    phase:
+    current-phase:
         description: An example command
-        permission: spigotplugin.phase
+        permission: spigotplugin.current-phase
         usage: /<command>
     start-hg:
         description: An example command

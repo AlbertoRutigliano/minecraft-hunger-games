@@ -185,6 +185,7 @@ public class ServerSchedulers {
 						SpigotPlugin.server.broadcastMessage("Starting a new Hunger Games Server");
 						SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
 						// SpigotPlugin.server.shutdown(); TODO Paused for testing purpose
+						ServerManager.restartServer();
 						SpigotPlugin.server.getScheduler().cancelTask(playingPhaseTaskId);
 					}
 				}	
@@ -226,4 +227,5 @@ public class ServerSchedulers {
 			
 		}, 20, 20); // 1 second = 20 ticks	
 	}
+	
 }
