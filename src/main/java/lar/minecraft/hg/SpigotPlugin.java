@@ -37,7 +37,7 @@ public class SpigotPlugin extends JavaPlugin {
     	
     	phase = HGPhase.WAITING_FOR_HG;
     	
-    	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); //TODO For test purpose
+    	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); // TODO For test purpose
     	
     	// Create world border
     	getServer().getWorld("world").getWorldBorder().setCenter(getServer().getWorld("world").getSpawnLocation());
@@ -47,6 +47,7 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("lobby").setExecutor(new TestCommand(this));
         getCommand("nolobby").setExecutor(new TestCommand(this));
         getCommand("start-hg").setExecutor(new TestCommand(this));
+        getCommand("phase").setExecutor(new TestCommand(this)); // TODO For test purpose
         
         getCommand("bowman").setExecutor(new ClassCommand());
         getCommand("armored").setExecutor(new ClassCommand());

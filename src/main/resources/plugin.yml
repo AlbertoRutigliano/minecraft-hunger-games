@@ -20,6 +20,10 @@ commands:
         description: An example command
         permission: spigotplugin.test
         usage: /<command>
+    phase:
+        description: An example command
+        permission: spigotplugin.phase
+        usage: /<command>
     start-hg:
         description: An example command
         permission: spigotplugin.start

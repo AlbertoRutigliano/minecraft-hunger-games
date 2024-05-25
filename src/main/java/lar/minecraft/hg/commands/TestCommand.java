@@ -25,6 +25,11 @@ public class TestCommand implements CommandExecutor {
         if (cmdName.equals("start-hg")) {
         	new ServerSchedulers(plugin).lobbyPhase();
         }
+        
+        if (cmdName.equals("phase")) {
+        	sender.sendMessage("Current phase is " + SpigotPlugin.getPhase());
+        	
+        }
 
         return true;
     }
