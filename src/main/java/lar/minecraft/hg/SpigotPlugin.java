@@ -15,7 +15,7 @@ import lar.minecraft.hg.managers.PlayerManager;
 public class SpigotPlugin extends JavaPlugin {
 	
 	public static Server server;
-	
+		
 	public static HGPhase phase;
 	
 	public static Map<Player, PlayerExt> playerExtension = new HashMap<>();
@@ -47,7 +47,9 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("lobby").setExecutor(new TestCommand(this));
         getCommand("nolobby").setExecutor(new TestCommand(this));
         getCommand("start-hg").setExecutor(new TestCommand(this));
-        getCommand("phase").setExecutor(new TestCommand(this)); // TODO For test purpose
+        getCommand("current-phase").setExecutor(new TestCommand(this));
+        
+        getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         
         getCommand("bowman").setExecutor(new ClassCommand());
         getCommand("armored").setExecutor(new ClassCommand());
