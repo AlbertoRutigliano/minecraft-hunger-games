@@ -44,10 +44,10 @@ public class SpigotPlugin extends JavaPlugin {
     	getServer().getWorld("world").getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
     	
         // Commands enabled with following method must have entries in plugin.yml
-        getCommand("lobby").setExecutor(new TestCommand(this));
-        getCommand("nolobby").setExecutor(new TestCommand(this));
         getCommand("start-hg").setExecutor(new TestCommand(this));
         getCommand("current-phase").setExecutor(new TestCommand(this));
+        
+        getCommand("test").setExecutor(new TestCommand(this));
         
         getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         

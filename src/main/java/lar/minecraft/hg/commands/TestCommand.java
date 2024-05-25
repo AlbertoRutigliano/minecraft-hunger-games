@@ -20,6 +20,10 @@ public class TestCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         String cmdName = cmd.getName().toLowerCase();
 
+        if (cmdName.equals("test")) {
+        	ServerSchedulers.spawnSupplyDrop();
+        }
+        
         if (cmdName.equals("restart-hg-server")) {
         	ServerManager.restartServer();
         }

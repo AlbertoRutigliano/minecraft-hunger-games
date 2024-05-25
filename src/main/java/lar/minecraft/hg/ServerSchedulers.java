@@ -1,16 +1,21 @@
 package lar.minecraft.hg;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CompassMeta;
@@ -226,6 +231,24 @@ public class ServerSchedulers {
 			}
 			
 		}, 20, 20); // 1 second = 20 ticks	
+	}
+	
+	public static void spawnSupplyDrop() {
+		// Get the spawn location (for example, the world's spawn location)
+        Location spawnLocation = Bukkit.getWorld("world").getSpawnLocation();
+        
+        // Create a chest block at the spawn location
+        Block block = spawnLocation.getBlock();
+        block.setType(Material.CHEST);
+        
+        // Get the chest's inventory
+        Chest chest = (Chest) block.getState();
+        Inventory chestInventory = chest.getBlockInventory();
+        
+        // Add items to the chest's inventory
+        chestInventory.addItem(new ItemStack(Material.DIAMOND, 5));
+        chestInventory.addItem(new ItemStack(Material.GOLD_INGOT, 10));
+        chestInventory.addItem(new ItemStack(Material.IRON_INGOT, 20));
 	}
 	
 }
