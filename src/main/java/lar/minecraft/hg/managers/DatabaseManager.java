@@ -2,8 +2,10 @@ package lar.minecraft.hg.managers;
 import java.sql.*;
 import org.bukkit.entity.Player;
 
+// TODO Make optional connection
 public class DatabaseManager {
 	
+	// TODO Add these properties into config.yml file
 	private static String connectionString = "jdbc:mysql://localhost:3306/hunger_games";
 	private static String databaseUser = "multicraft";
 	private static String databasePassword = "4E3M4dYSlP9g2yC#";

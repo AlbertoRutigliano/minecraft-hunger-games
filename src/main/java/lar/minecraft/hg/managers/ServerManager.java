@@ -1,10 +1,15 @@
 package lar.minecraft.hg.managers;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
@@ -67,5 +72,26 @@ public class ServerManager {
 			player.updateInventory();
 		}
 	}
+	
+	public static void restartServer() {
+		// Save all worlds before restarting
+		Bukkit.getScheduler().runTask(SpigotPlugin.getPlugin(SpigotPlugin.class), () -> {
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "save-all");
+			Bukkit.getScheduler().runTaskLater(SpigotPlugin.getPlugin(SpigotPlugin.class), () -> {
+				saveRestartFlag();
+				Bukkit.spigot().restart();
+			}, 100L); // 5-second delay to ensure save completion
+		});
+	}
+	
+	private static void saveRestartFlag() {
+    	File restartFlagFile = new File(SpigotPlugin.getPlugin(SpigotPlugin.class).getDataFolder(), "restart.flag");
+        FileConfiguration restartFlagConfig = YamlConfiguration.loadConfiguration(restartFlagFile);
+        try {
+        	restartFlagConfig.save(restartFlagFile);
+        } catch (IOException e) {
+        	e.printStackTrace();
+        }
+    }
 	
 }

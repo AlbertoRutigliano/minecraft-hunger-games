@@ -8,12 +8,14 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import lar.minecraft.hg.commands.ClassCommand;
+import lar.minecraft.hg.commands.TestCommand;
 import lar.minecraft.hg.managers.PlayerManager;
 
 public class SpigotPlugin extends JavaPlugin {
 	
 	public static Server server;
-	
+		
 	public static HGPhase phase;
 	
 	public static Map<Player, PlayerExt> playerExtension = new HashMap<>();
@@ -35,7 +37,7 @@ public class SpigotPlugin extends JavaPlugin {
     	
     	phase = HGPhase.WAITING_FOR_HG;
     	
-    	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); //TODO For test purpose
+    	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); // TODO For test purpose
     	
     	// Create world border
     	getServer().getWorld("world").getWorldBorder().setCenter(getServer().getWorld("world").getSpawnLocation());
@@ -45,14 +47,15 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("lobby").setExecutor(new TestCommand(this));
         getCommand("nolobby").setExecutor(new TestCommand(this));
         getCommand("start-hg").setExecutor(new TestCommand(this));
+        getCommand("current-phase").setExecutor(new TestCommand(this));
         
-        getCommand("bowman").setExecutor(new ClassCommand());
-        getCommand("armored").setExecutor(new ClassCommand());
-        getCommand("doglover").setExecutor(new ClassCommand());
+        getCommand("restart-hg-server").setExecutor(new TestCommand(this));
+        
+        ClassCommand.AVAILABLE_CLASSES.forEach( c -> {
+        	getCommand(c).setExecutor(new ClassCommand());
+        });
         
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
-        
-        //ServerSchedulers.initGameStartCounter();
         
     }
     
