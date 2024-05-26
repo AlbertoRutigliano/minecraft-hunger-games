@@ -49,7 +49,7 @@ public class SpigotPlugin extends JavaPlugin {
     	phase = HGPhase.WAITING_FOR_HG;
     	serverId = getConfig().getInt("server.id");
     	
-    	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); // TODO For test purpose
+    	getServer().getWorld("world").setDifficulty(Difficulty.NORMAL);
     	
     	// Create world border
     	getServer().getWorld("world").getWorldBorder().setCenter(getServer().getWorld("world").getSpawnLocation());
