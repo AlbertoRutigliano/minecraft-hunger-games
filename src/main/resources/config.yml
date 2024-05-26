@@ -3,13 +3,15 @@ durations:
  safe-area: 20
  winner-celebrations: 20
  fireworks: 20
+ supply-drop: 10
 world-border:
  max-size: 128
  min-size: 2
 server:
  id: 1
+ auto-restart: false
 database:
- enable: true
+ enable: false
  connection-string: jdbc:mysql://51.38.125.46:3306/hunger_games
  db-user: test
  db-password: test
