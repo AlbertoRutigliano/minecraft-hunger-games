@@ -85,11 +85,17 @@ public class ServerSchedulers {
 	public void safeAreaPhase() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
 		safeAreaTime = 0;
-		currentHGGameId = DatabaseManager.createHGGame(1);
+
+		// Register new HungerGames game on Database
+		currentHGGameId = DatabaseManager.createHGGame(SpigotPlugin.serverId);
+		
+		// Notify all players that Hunger Games is starting
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("It's starting the Hunger Games!"));
 			p.setGameMode(GameMode.SURVIVAL);
 			p.teleport(world.getSpawnLocation());
+			
+			// Write player join on Database
 			DatabaseManager.addPlayerJoin(config.getInt("server.id", 1), currentHGGameId, p);
 		});
 		ServerManager.giveClasses();
@@ -170,6 +176,8 @@ public class ServerSchedulers {
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * config.getInt("winner-celebrations", 20));
+						
+						// Save the winning player on Database
 						DatabaseManager.savePlayerWin(config.getInt("server.id", 1), currentHGGameId, winner);
 						fireworkEffect(winner);
 					}
