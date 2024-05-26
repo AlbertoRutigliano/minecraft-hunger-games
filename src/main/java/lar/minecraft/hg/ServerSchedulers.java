@@ -266,7 +266,7 @@ public class ServerSchedulers {
 				
 				long passedSeconds = (execTime - supplyDropTime) / 20;
 				
-				if (passedSeconds <= 10) {
+				if (Math.abs(passedSeconds) <= 10) {
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 						p.spigot().sendMessage(
 								ChatMessageType.ACTION_BAR, 
