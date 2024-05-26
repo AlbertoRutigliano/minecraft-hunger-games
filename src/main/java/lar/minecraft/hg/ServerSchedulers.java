@@ -66,8 +66,12 @@ public class ServerSchedulers {
 	
 	public void waitingPhase() {
 		SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+		ServerManager.getLivingPlayers().forEach(p -> {
+			p.setGameMode(GameMode.ADVENTURE);
+			p.getInventory().clear();
+		});
 		waitingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
-			int minimumPlayers = config.getInt(Config.MIN_PLAYERS, 3);
+			int minimumPlayers = config.getInt("min-players", 3);
 			@Override
 			public void run() {
 				if (SpigotPlugin.server.getOnlinePlayers().size() < minimumPlayers) {
@@ -88,17 +92,24 @@ public class ServerSchedulers {
 	
 	public void lobbyPhase() {
 		SpigotPlugin.setPhase(HGPhase.LOBBY);
+		ServerManager.getLivingPlayers().forEach(p -> {
+			p.setGameMode(GameMode.ADVENTURE);
+			p.getInventory().clear();
+		});
 		gameStartTime = 0;
 		lobbyPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();
+				
+				int minimumPlayers = config.getInt("min-players", 3);
+				if (SpigotPlugin.server.getOnlinePlayers().size() < minimumPlayers) {
+					waitingPhase();
+					server.getScheduler().cancelTask(lobbyPhaseTaskId);
+				}
+				
 				// First runnable run
 				if (gameStartTime == 0) {
 					gameStartTime = execTime + (20 * config.getInt("durations.lobby", 30)); // Game will start in X seconds
-					ServerManager.getLivingPlayers().forEach(p -> {
-						p.setGameMode(GameMode.ADVENTURE);
-						p.getInventory().clear();
-					});
 				}
 				long passedSeconds = (execTime - gameStartTime) / 20;
 				for(Player p : SpigotPlugin.server.getOnlinePlayers()) {

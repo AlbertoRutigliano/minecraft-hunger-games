@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,8 +18,6 @@ public class SpigotPlugin extends JavaPlugin {
 	
 	public static Server server;
 	
-	public static World world;
-		
 	public static HGPhase phase;
 	
 	public static int serverId;
@@ -31,7 +28,6 @@ public class SpigotPlugin extends JavaPlugin {
     public void onLoad() {
 		server = getServer();
 		saveDefaultConfig();
-		world = server.getWorld(getConfig().getString(Config.WORLD_NAME, Config.DEFAULT_WORLD_NANME));
     }
 	
     @Override
@@ -52,11 +48,11 @@ public class SpigotPlugin extends JavaPlugin {
     	
     	serverId = getConfig().getInt("server.id");
     	
-    	world.setDifficulty(Difficulty.NORMAL);
+    	server.getWorld("world").setDifficulty(Difficulty.NORMAL);
     	
     	// Create world border
-    	world.getWorldBorder().setCenter(world.getSpawnLocation());
-    	world.getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
+    	server.getWorld("world").getWorldBorder().setCenter(server.getWorld("world").getSpawnLocation());
+    	server.getWorld("world").getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
     	
     	// Instantiate database connection and connect
     	new DatabaseManager(this, true);
