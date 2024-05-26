@@ -8,3 +8,8 @@ world-border:
  min-size: 2
 server:
  id: 1
+database:
+ enable: true
+ connection-string: jdbc:mysql://51.38.125.46:3306/hunger_games
+ db-user: test
+ db-password: test

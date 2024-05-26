@@ -1,5 +1,6 @@
 package lar.minecraft.hg;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import lar.minecraft.hg.commands.ClassCommand;
 import lar.minecraft.hg.commands.TestCommand;
+import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerManager;
 
 public class SpigotPlugin extends JavaPlugin {
@@ -17,6 +19,8 @@ public class SpigotPlugin extends JavaPlugin {
 	public static Server server;
 		
 	public static HGPhase phase;
+	
+	public static int serverId;
 	
 	public static Map<Player, PlayerExt> playerExtension = new HashMap<>();
 	
@@ -29,6 +33,13 @@ public class SpigotPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         // Don't log disabling, Spigot does that for you automatically!
+    	try {
+			DatabaseManager.disconnectToDatabase();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
 
     @Override
@@ -36,12 +47,16 @@ public class SpigotPlugin extends JavaPlugin {
         // Don't log enabling, Spigot does that for you automatically!
     	
     	phase = HGPhase.WAITING_FOR_HG;
+    	serverId = getConfig().getInt("server.id");
     	
     	getServer().getWorld("world").setDifficulty(Difficulty.PEACEFUL); // TODO For test purpose
     	
     	// Create world border
     	getServer().getWorld("world").getWorldBorder().setCenter(getServer().getWorld("world").getSpawnLocation());
     	getServer().getWorld("world").getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
+    	
+    	// Instantiate database connection and connect
+    	new DatabaseManager(this, true);
     	
         // Commands enabled with following method must have entries in plugin.yml
         getCommand("lobby").setExecutor(new TestCommand(this));
