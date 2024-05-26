@@ -14,7 +14,7 @@ commands:
         usage: /<command>
     restart-hg-server:
         description: An example command
-        permission: sperm.op
+        permission: perm.op
         usage: /<command>
     current-phase:
         description: An example command
