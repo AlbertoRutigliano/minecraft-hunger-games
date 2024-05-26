@@ -31,20 +31,10 @@ public class SpigotPlugin extends JavaPlugin {
     }
 	
     @Override
-    public void onDisable() {
-        // Don't log disabling, Spigot does that for you automatically!
-    	try {
-			DatabaseManager.disconnectToDatabase();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-    }
-
-    @Override
     public void onEnable() {
         // Don't log enabling, Spigot does that for you automatically!
+    	
+    	SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
     	
     	serverId = getConfig().getInt("server.id");
     	
@@ -75,6 +65,18 @@ public class SpigotPlugin extends JavaPlugin {
         	new ServerSchedulers(this).waitingPhase();
         }
         
+    }
+    
+    @Override
+    public void onDisable() {
+        // Don't log disabling, Spigot does that for you automatically!
+    	try {
+			DatabaseManager.disconnectToDatabase();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
     
     public static HGPhase getPhase() {
