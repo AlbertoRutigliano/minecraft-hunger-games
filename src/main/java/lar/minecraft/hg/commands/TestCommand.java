@@ -21,7 +21,7 @@ public class TestCommand implements CommandExecutor {
         String cmdName = cmd.getName().toLowerCase();
 
         if (cmdName.equals("test")) {
-        	ServerSchedulers.spawnSupplyDrop();
+        	
         }
         
         if (cmdName.equals("restart-hg-server")) {
@@ -32,7 +32,7 @@ public class TestCommand implements CommandExecutor {
         	new ServerSchedulers(plugin).lobbyPhase();
         }
         
-        if (cmdName.equals("phase")) {
+        if (cmdName.equals("current-phase")) {
         	sender.sendMessage("Current phase is " + SpigotPlugin.getPhase());
         }
 

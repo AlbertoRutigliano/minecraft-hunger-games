@@ -1,5 +1,7 @@
 package lar.minecraft.hg;
 
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -50,11 +52,13 @@ public class ServerSchedulers {
 	private static long winnerCelebrationsTime = 0;
 	private static long fireworksEffectsTime = 0;
 	private static long worldBorderCollapseTime = 0;
+	private static long supplyDropTime = 0;
 	
 	private static int lobbyPhaseTaskId = -1;
 	private static int safeAreaPhaseTaskId = -1;
 	private static int playingPhaseTaskId = -1;
 	private static int fireworksEffectsTaskId = -1;
+	private static int supplyDropTaskId = -1;
 	
 	private final static int WORLD_BORDER_COLLAPSE_COUNTER_SECONDS = 60; // TODO May be added on config.yml
 	private final static int WORLD_BORDER_COLLAPSE_RADIUS = 20; // TODO May be added on config.yml
@@ -111,7 +115,7 @@ public class ServerSchedulers {
 
 				ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
 						ChatMessageType.ACTION_BAR, 
-						TextComponent.fromLegacyText("Safe area expire in " + Math.abs(passedSeconds) + " seconds")));
+						TextComponent.fromLegacyText("Safe area expires in " + Math.abs(passedSeconds) + " seconds")));
 				if (passedSeconds == 0) {
 					ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
 							ChatMessageType.ACTION_BAR, 
@@ -122,6 +126,7 @@ public class ServerSchedulers {
 				
 			}
 		}, 20, 20); // 1 second = 20 ticks
+		
 	}
 	
 	public void playingPhase() {
@@ -174,7 +179,7 @@ public class ServerSchedulers {
 						Player winner = ServerManager.getLivingPlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
-						winnerCelebrationsTime = execTime + (20 * config.getInt("winner-celebrations", 20));
+						winnerCelebrationsTime = execTime + (20 * config.getInt("durations.winner-celebrations", 20));
 						DatabaseManager.savePlayerWin(config.getInt("server.id", 1), currentHGGameId, winner);
 						fireworkEffect(winner);
 					}
@@ -187,15 +192,21 @@ public class ServerSchedulers {
 								TextComponent.fromLegacyText("A new Hunger Games will start in " + Math.abs(passedSeconds) + " seconds. Server will be restarted"));
 					}
 					if (passedSeconds == 0) {
-						SpigotPlugin.server.broadcastMessage("Starting a new Hunger Games Server");
 						SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
-						// SpigotPlugin.server.shutdown(); TODO Paused for testing purpose
-						ServerManager.restartServer();
+						if (config.getBoolean("server.auto-restart", false)) {
+							ServerManager.restartServer();
+						}
 						SpigotPlugin.server.getScheduler().cancelTask(playingPhaseTaskId);
 					}
 				}	
 			}
+			
+			
+			
 		}, 20, 20); // 1 second = 20 ticks
+		
+		supplyDrop();
+		
 	}
 	
 	public static void currentPhaseLogger() {
@@ -213,7 +224,7 @@ public class ServerSchedulers {
 			public void run() {
 				long execTime = world.getTime();
 				if (fireworksEffectsTime == 0) {
-					fireworksEffectsTime = execTime + (20 * config.getInt("fireworks", 20));
+					fireworksEffectsTime = execTime + (20 * config.getInt("durations.fireworks", 20));
 				}
 				long passedSeconds = (execTime - fireworksEffectsTime) / 20;
 				
@@ -233,12 +244,54 @@ public class ServerSchedulers {
 		}, 20, 20); // 1 second = 20 ticks	
 	}
 	
-	public static void spawnSupplyDrop() {
-		// Get the spawn location (for example, the world's spawn location)
+	private void supplyDrop() {
+		supplyDropTime = 0;
+		supplyDropTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+			@Override
+			public void run() {
+				long execTime = world.getTime();
+				
+				// Spawn a supply drop chest after durations.supply-drop seconds
+				if (supplyDropTime == 0) {
+					supplyDropTime = execTime + (20 * config.getInt("durations.supply-drop", 10));
+				}
+				
+				long passedSeconds = (execTime - supplyDropTime) / 20;
+				
+				if (passedSeconds <= 10) {
+					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
+						p.spigot().sendMessage(
+								ChatMessageType.ACTION_BAR, 
+								TextComponent.fromLegacyText("A supply drop chest will be spawned in " + Math.abs(passedSeconds) + " seconds."));
+					}
+				}
+				
+				if (passedSeconds == 0) {
+					spawnSupplyDrop();
+					server.getScheduler().cancelTask(supplyDropTaskId);
+				}
+			}
+			
+		}, 20, 20); // 1 second = 20 ticks	
+	}
+	
+	private static void spawnSupplyDrop() {
+		// Get the spawn location
         Location spawnLocation = Bukkit.getWorld("world").getSpawnLocation();
+
+        // Generate random offsets for X and Z coordinates
+        Random random = new Random();
+        int offsetX = random.nextInt(21) - 10; // Random value between -10 and 10
+        int offsetZ = random.nextInt(21) - 10; // Random value between -10 and 10
+
+        // Apply offsets to the spawn location
+        Location randomLocation = spawnLocation.clone().add(offsetX, 0, offsetZ);
+
+        // Find the highest block at the random location
+        Location chestLocation = randomLocation.getWorld().getHighestBlockAt(randomLocation).getLocation().add(0, 1, 0);;
         
         // Create a chest block at the spawn location
-        Block block = spawnLocation.getBlock();
+        Block block = chestLocation.getBlock();
         block.setType(Material.CHEST);
         
         // Get the chest's inventory
@@ -249,6 +302,8 @@ public class ServerSchedulers {
         chestInventory.addItem(new ItemStack(Material.DIAMOND, 5));
         chestInventory.addItem(new ItemStack(Material.GOLD_INGOT, 10));
         chestInventory.addItem(new ItemStack(Material.IRON_INGOT, 20));
+        
+        Bukkit.broadcastMessage("Supply chest dropped at (x = " + chestLocation.getX() + ", y = " + chestLocation.getY() + ", z = " + chestLocation.getZ() + ")");
 	}
 	
 }
