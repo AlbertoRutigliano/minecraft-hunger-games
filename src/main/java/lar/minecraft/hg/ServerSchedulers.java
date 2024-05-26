@@ -276,6 +276,8 @@ public class ServerSchedulers {
 	}
 	
 	private static void spawnSupplyDrop() {
+		ServerManager.sendSound(Sound.BLOCK_BELL_USE);
+		
 		// Get the spawn location
         Location spawnLocation = Bukkit.getWorld("world").getSpawnLocation();
 
