@@ -72,6 +72,10 @@ public class SpigotPlugin extends JavaPlugin {
         
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
         
+        if (getConfig().getBoolean("server.auto-start", true)) {
+        	new ServerSchedulers(this).lobbyPhase();
+        }
+        
     }
     
     public static HGPhase getPhase() {

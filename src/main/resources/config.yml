@@ -1,17 +1,30 @@
 durations:
- lobby: 20
- safe-area: 20
- winner-celebrations: 20
- fireworks: 20
- supply-drop: 10
+  # Lobby phase duration in seconds where players can login and choose their class
+  lobby: 10
+  # Safe area duration in seconds where players can destroy blocks and collect items but cannot hit other players
+  safe-area: 30
+  # Winner celebrations duration in seconds
+  winner-celebrations: 15
+  # Fireworks celebrations duration in seconds
+  fireworks: 15 
+  # How many seconds after the start of the game (after safe-area phase) is the supply chest dropped
+  supply-drop: 60 
 world-border:
- max-size: 128
- min-size: 2
+  # Max world size dimension in blocks
+  max-size: 128
+  # Min world size dimension in blocks
+  min-size: 2
 server:
- id: 1
- auto-restart: false
+  id: 1
+  # When server is started, automatically start a new Hunger Games session
+  auto-start: false
+  # Automatically restart server when Hunger Games session is finished
+  auto-restart: false
 database:
- enable: false
- connection-string: jdbc:mysql://51.38.125.46:3306/hunger_games
- db-user: test
- db-password: test
+  # Enable and connect to a database to save Hunger Games informations and statistics
+  enable: false
+  # Connection string for the database
+  connection-string: jdbc:mysql://51.38.125.46:3306/hunger_games
+  # Database Connection user credentials
+  db-user: test
+  db-password: test
