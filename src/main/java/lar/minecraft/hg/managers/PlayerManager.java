@@ -50,7 +50,9 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
-		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
+			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		}
 	}
 	
 	@EventHandler
@@ -64,6 +66,7 @@ public class PlayerManager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
 			event.getPlayer().setGameMode(GameMode.ADVENTURE);
+			event.getPlayer().playSound(event.getPlayer(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
 			event.setJoinMessage(null);
