@@ -65,6 +65,9 @@ public class ServerManager {
 						dog.setAdult();
 						dog.setSitting(false);
 						break;
+					case "lavaman":
+						playerInventory.addItem(new ItemStack(Material.LAVA_BUCKET), new ItemStack(Material.LAVA_BUCKET), new ItemStack(Material.LAVA_BUCKET));
+						break;
 					default:
 						break;
 				}

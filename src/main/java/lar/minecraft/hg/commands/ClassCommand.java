@@ -14,7 +14,7 @@ import lar.minecraft.hg.SpigotPlugin;
 public class ClassCommand implements CommandExecutor {
 	
 	public static final ArrayList<String> AVAILABLE_CLASSES = new ArrayList<>(Arrays.asList(new String[] {
-			"bowman", "armored", "doglover"
+			"bowman", "armored", "doglover", "lavaman"
 	}));
     
 	@Override
