@@ -36,6 +36,7 @@ public class ServerSchedulers {
 	private Server server;
 	private int worldBorderSize = 256;
 	private int worldBorderMinumumSize = 32;
+	private int idleTimeout = 2;
 	
 	public ServerSchedulers(SpigotPlugin plugin) {
 		this.config = plugin.getConfig();
@@ -43,6 +44,7 @@ public class ServerSchedulers {
 		this.world = server.getWorld("world");
 		this.worldBorderSize = config.getInt("world-border.max-size", worldBorderSize);
 		this.worldBorderMinumumSize = config.getInt("world-border.min-size", worldBorderMinumumSize);
+		this.idleTimeout = config.getInt("durations.idle-timeout");
 	}
 	
 	private static int currentHGGameId = 0;
@@ -139,6 +141,7 @@ public class ServerSchedulers {
 		SpigotPlugin.setPhase(HGPhase.PLAYING);
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
+		server.setIdleTimeout(idleTimeout);
 		playingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();

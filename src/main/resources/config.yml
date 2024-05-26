@@ -8,7 +8,9 @@ durations:
   # Fireworks celebrations duration in seconds
   fireworks: 15 
   # How many seconds after the start of the game (after safe-area phase) is the supply chest dropped
-  supply-drop: 60 
+  supply-drop: 60
+  # How many seconds a player can be stationary during the playing phase before getting kicked (minutes)
+  idle-timeout: 2
 world-border:
   # Max world size dimension in blocks
   max-size: 128
