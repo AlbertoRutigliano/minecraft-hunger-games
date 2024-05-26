@@ -21,7 +21,7 @@ public class TestCommand implements CommandExecutor {
         String cmdName = cmd.getName().toLowerCase();
 
         if (cmdName.equals("test")) {
-        	
+        	new ServerSchedulers(plugin).waitingPhase();
         }
         
         if (cmdName.equals("restart-hg-server")) {
