@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,6 +18,8 @@ import lar.minecraft.hg.managers.PlayerManager;
 public class SpigotPlugin extends JavaPlugin {
 	
 	public static Server server;
+	
+	public static World world;
 		
 	public static HGPhase phase;
 	
@@ -28,6 +31,7 @@ public class SpigotPlugin extends JavaPlugin {
     public void onLoad() {
 		server = getServer();
 		saveDefaultConfig();
+		world = server.getWorld(getConfig().getString(Config.WORLD_NAME, Config.DEFAULT_WORLD_NANME));
     }
 	
     @Override
@@ -46,14 +50,13 @@ public class SpigotPlugin extends JavaPlugin {
     public void onEnable() {
         // Don't log enabling, Spigot does that for you automatically!
     	
-    	phase = HGPhase.WAITING_FOR_HG;
     	serverId = getConfig().getInt("server.id");
     	
-    	getServer().getWorld("world").setDifficulty(Difficulty.NORMAL);
+    	world.setDifficulty(Difficulty.NORMAL);
     	
     	// Create world border
-    	getServer().getWorld("world").getWorldBorder().setCenter(getServer().getWorld("world").getSpawnLocation());
-    	getServer().getWorld("world").getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
+    	world.getWorldBorder().setCenter(world.getSpawnLocation());
+    	world.getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
     	
     	// Instantiate database connection and connect
     	new DatabaseManager(this, true);
@@ -73,7 +76,7 @@ public class SpigotPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
         
         if (getConfig().getBoolean("server.auto-start", true)) {
-        	new ServerSchedulers(this).lobbyPhase();
+        	new ServerSchedulers(this).waitingPhase();
         }
         
     }
