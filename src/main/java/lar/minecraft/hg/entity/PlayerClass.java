@@ -3,24 +3,25 @@ package lar.minecraft.hg.entity;
 import org.bukkit.Sound;
 
 import lar.minecraft.hg.PlayerAction;
+import lar.minecraft.hg.enums.PlayerClassEnum;
 
 public class PlayerClass {
 
-	private String name;
+	private PlayerClassEnum name;
 	private Sound sound;
 	private PlayerAction action;
 
-    public PlayerClass(String name, Sound sound, PlayerAction action) {
+    public PlayerClass(PlayerClassEnum name, Sound sound, PlayerAction action) {
         this.name = name;
         this.sound = sound;
         this.action = action;
     }
 
-    public String getName() {
+    public PlayerClassEnum getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(PlayerClassEnum name) {
         this.name = name;
     }
 
@@ -57,14 +58,10 @@ public class PlayerClass {
 		if (getClass() != obj.getClass())
 			return false;
 		PlayerClass other = (PlayerClass) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
+		if (name != other.name)
 			return false;
 		return true;
 	}
-	
-	
+
 	
 }

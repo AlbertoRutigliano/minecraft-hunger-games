@@ -63,7 +63,7 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         
         PlayerClassManager.AVAILABLE_PLAYER_CLASSES.keySet().forEach(c -> {
-        	getCommand(c).setExecutor(new ClassCommand());
+        	getCommand(c.name()).setExecutor(new ClassCommand());
         });
         
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
