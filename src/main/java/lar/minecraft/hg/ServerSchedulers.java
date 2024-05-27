@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.managers.DatabaseManager;
+import lar.minecraft.hg.managers.PlayerClassManager;
 import lar.minecraft.hg.managers.PlayerManager;
 import lar.minecraft.hg.managers.ServerManager;
 import net.md_5.bungee.api.ChatMessageType;
@@ -144,7 +145,7 @@ public class ServerSchedulers {
 			// Write player join on Database
 			DatabaseManager.addPlayerJoin(config.getInt("server.id", 1), currentHGGameId, p);
 		});
-		ServerManager.giveClasses();
+		PlayerClassManager.giveClasses();
 		ServerManager.sendSound(Sound.EVENT_RAID_HORN);
 		
 		safeAreaPhaseTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
