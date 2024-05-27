@@ -1,22 +1,17 @@
 package lar.minecraft.hg.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import lar.minecraft.hg.PlayerExt;
 import lar.minecraft.hg.SpigotPlugin;
+import lar.minecraft.hg.entity.PlayerClass;
+import lar.minecraft.hg.entity.PlayerExtra;
+import lar.minecraft.hg.managers.ServerManager;
 
 public class ClassCommand implements CommandExecutor {
 	
-	public static final ArrayList<String> AVAILABLE_CLASSES = new ArrayList<>(Arrays.asList(new String[] {
-			"bowman", "armored", "doglover", "lavaman"
-	}));
-    
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		String cmdName = command.getName().toLowerCase();
@@ -24,11 +19,16 @@ public class ClassCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			if (SpigotPlugin.isLobby()) {
-				if (AVAILABLE_CLASSES.contains(cmdName)) {
+				PlayerClass playerClass = ServerManager.AVAILABLE_PLAYER_CLASSES.getOrDefault(cmdName, null);
+				if (playerClass != null) {
+					
+					PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId());
+					playerExtra.setPlayerClass(playerClass);
+					SpigotPlugin.playerExtras.putIfAbsent(player.getUniqueId(), playerExtra);
+					
 					player.sendMessage("You will be a " + cmdName + "!");
-					PlayerExt playerExt = new PlayerExt();
-					playerExt.setChosenClass(cmdName);
-					SpigotPlugin.playerExtension.put(player, playerExt);
+					player.playSound(player, playerClass.getSound(), 10.0f, 10.0f);
+					
 				} else {
 					player.sendMessage("There is no \"" + cmdName + "\" class");
 				}

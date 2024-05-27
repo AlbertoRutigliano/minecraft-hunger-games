@@ -3,16 +3,18 @@ package lar.minecraft.hg;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Server;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import lar.minecraft.hg.commands.ClassCommand;
 import lar.minecraft.hg.commands.TestCommand;
+import lar.minecraft.hg.entity.PlayerExtra;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerManager;
+import lar.minecraft.hg.managers.ServerManager;
 
 public class SpigotPlugin extends JavaPlugin {
 	
@@ -22,11 +24,13 @@ public class SpigotPlugin extends JavaPlugin {
 	
 	public static int serverId;
 	
-	public static Map<Player, PlayerExt> playerExtension = new HashMap<>();
+	public static Map<UUID, PlayerExtra> playerExtras = new HashMap<>();
+	
 	
 	@Override
     public void onLoad() {
 		server = getServer();
+		ServerManager.initPlayerClasses();
 		saveDefaultConfig();
     }
 	
@@ -55,7 +59,7 @@ public class SpigotPlugin extends JavaPlugin {
         
         getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         
-        ClassCommand.AVAILABLE_CLASSES.forEach( c -> {
+        ServerManager.AVAILABLE_PLAYER_CLASSES.keySet().forEach(c -> {
         	getCommand(c).setExecutor(new ClassCommand());
         });
         

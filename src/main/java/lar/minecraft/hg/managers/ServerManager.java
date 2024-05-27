@@ -3,6 +3,8 @@ package lar.minecraft.hg.managers;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -16,9 +18,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import lar.minecraft.hg.SpigotPlugin;
+import lar.minecraft.hg.entity.PlayerClass;
+import lar.minecraft.hg.entity.PlayerExtra;
 
 public class ServerManager {
-
+	
+	public static final Map<String, PlayerClass> AVAILABLE_PLAYER_CLASSES = new HashMap<>();
+	
+	public static void initPlayerClasses() {
+		AVAILABLE_PLAYER_CLASSES.put("bowman", new PlayerClass("bowman", Sound.ITEM_CROSSBOW_HIT));
+		AVAILABLE_PLAYER_CLASSES.put("armored", new PlayerClass("armored", Sound.ITEM_ARMOR_EQUIP_IRON));
+		AVAILABLE_PLAYER_CLASSES.put("doglover", new PlayerClass("doglover", Sound.ENTITY_WOLF_PANT));
+		AVAILABLE_PLAYER_CLASSES.put("lavaman", new PlayerClass("lavaman", Sound.ITEM_BUCKET_FILL_LAVA));
+	}
+	
 	/**
 	 * Send sound to all players
 	 * 
@@ -45,9 +58,9 @@ public class ServerManager {
 			PlayerInventory playerInventory = player.getInventory();
 			playerInventory.clear();
 			playerInventory.addItem(new ItemStack(Material.COMPASS));
-			if (SpigotPlugin.playerExtension.get(player) != null) {
-				String chosenClass = SpigotPlugin.playerExtension.get(player).getChosenClass();
-				player.sendMessage("Giving " + chosenClass + " items");
+			PlayerExtra playerExtra = SpigotPlugin.playerExtras.getOrDefault(player.getUniqueId(), null);
+			if (playerExtra != null && AVAILABLE_PLAYER_CLASSES.containsKey(playerExtra.getPlayerClass().getName())) {
+				String chosenClass = playerExtra.getPlayerClass().getName();
 				switch (chosenClass) {
 					case "bowman":
 						playerInventory.addItem(new ItemStack(Material.BOW), new ItemStack(Material.ARROW, 16));
