@@ -1,6 +1,8 @@
-package lar.minecraft.hg.entity;
+package lar.minecraft.hg.entities;
 
 import java.util.UUID;
+
+import lar.minecraft.hg.enums.PlayerClass;
 
 public class PlayerExtra {
 	
