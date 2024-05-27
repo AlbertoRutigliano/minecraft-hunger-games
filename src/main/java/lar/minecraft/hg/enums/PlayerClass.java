@@ -8,6 +8,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public enum PlayerClass {
+	MINER (Sound.ENTITY_ITEM_BREAK) {
+		@Override
+		public PlayerAction getAction() {
+			return (player) -> {
+            	player.getInventory().addItem(new ItemStack(Material.IRON_PICKAXE), new ItemStack(Material.TORCH, 8));
+            };
+		}
+	},
     BOWMAN (Sound.ITEM_CROSSBOW_HIT) {
         @Override
         public PlayerAction getAction() {
