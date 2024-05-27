@@ -12,9 +12,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import lar.minecraft.hg.commands.ClassCommand;
 import lar.minecraft.hg.commands.TestCommand;
 import lar.minecraft.hg.entity.PlayerExtra;
+import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.managers.DatabaseManager;
+import lar.minecraft.hg.managers.PlayerClassManager;
 import lar.minecraft.hg.managers.PlayerManager;
-import lar.minecraft.hg.managers.ServerManager;
 
 public class SpigotPlugin extends JavaPlugin {
 	
@@ -30,9 +31,11 @@ public class SpigotPlugin extends JavaPlugin {
 	@Override
     public void onLoad() {
 		server = getServer();
-		ServerManager.initPlayerClasses();
+		new PlayerClassManager().initPlayerClasses();
 		saveDefaultConfig();
     }
+	
+	
 	
     @Override
     public void onEnable() {
@@ -59,7 +62,7 @@ public class SpigotPlugin extends JavaPlugin {
         
         getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         
-        ServerManager.AVAILABLE_PLAYER_CLASSES.keySet().forEach(c -> {
+        PlayerClassManager.AVAILABLE_PLAYER_CLASSES.keySet().forEach(c -> {
         	getCommand(c).setExecutor(new ClassCommand());
         });
         

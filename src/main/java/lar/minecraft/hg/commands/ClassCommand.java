@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entity.PlayerClass;
 import lar.minecraft.hg.entity.PlayerExtra;
-import lar.minecraft.hg.managers.ServerManager;
+import lar.minecraft.hg.managers.PlayerClassManager;
 
 public class ClassCommand implements CommandExecutor {
 	
@@ -19,7 +19,7 @@ public class ClassCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			if (SpigotPlugin.isLobby()) {
-				PlayerClass playerClass = ServerManager.AVAILABLE_PLAYER_CLASSES.getOrDefault(cmdName, null);
+				PlayerClass playerClass = PlayerClassManager.AVAILABLE_PLAYER_CLASSES.getOrDefault(cmdName, null);
 				if (playerClass != null) {
 					
 					PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId());

@@ -2,31 +2,43 @@ package lar.minecraft.hg.entity;
 
 import org.bukkit.Sound;
 
+import lar.minecraft.hg.PlayerAction;
+
 public class PlayerClass {
 
 	private String name;
 	private Sound sound;
-	
-	public PlayerClass(String name, Sound sound) {
-		this.name = name;
-		this.sound = sound;
-	}
+	private PlayerAction action;
 
-	public String getName() {
-		return name;
-	}
+    public PlayerClass(String name, Sound sound, PlayerAction action) {
+        this.name = name;
+        this.sound = sound;
+        this.action = action;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Sound getSound() {
-		return sound;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setSound(Sound sound) {
-		this.sound = sound;
-	}
+    public Sound getSound() {
+        return sound;
+    }
+
+    public void setSound(Sound sound) {
+        this.sound = sound;
+    }
+
+    public PlayerAction getAction() {
+        return action;
+    }
+
+    public void setAction(PlayerAction action) {
+        this.action = action;
+    }
 
 	@Override
 	public int hashCode() {
