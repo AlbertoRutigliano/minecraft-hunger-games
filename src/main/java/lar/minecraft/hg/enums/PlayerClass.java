@@ -24,15 +24,15 @@ public enum PlayerClass {
             };
         }
     },
-    ARMORED (Sound.ITEM_ARMOR_EQUIP_IRON) {
+    ARMORED (Sound.ITEM_ARMOR_EQUIP_LEATHER) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
             	PlayerInventory playerInventory = player.getInventory();
-                playerInventory.setHelmet(new ItemStack(Material.IRON_HELMET));
-                playerInventory.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-                playerInventory.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-                playerInventory.setBoots(new ItemStack(Material.IRON_BOOTS));
+                playerInventory.setHelmet(new ItemStack(Material.LEATHER_HELMET));
+                playerInventory.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+                playerInventory.setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+                playerInventory.setBoots(new ItemStack(Material.LEATHER_BOOTS));
             };
         }
     },
