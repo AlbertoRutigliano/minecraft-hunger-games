@@ -23,26 +23,11 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event){
-		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		Player killedPlayer = event.getEntity().getPlayer();
+		killedPlayer.getWorld().strikeLightningEffect(killedPlayer.getLocation());
 		killedPlayer.setGameMode(GameMode.SPECTATOR);
-		
-		// Check if the killer is a player
-        if (event.getEntity().getKiller() != null) {
-            // Get the player who was killed and the killer
-            Player killer = killedPlayer.getKiller();
-            
-            // Create the player head item
-            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
-            if (skullMeta != null) {
-                skullMeta.setOwningPlayer(killedPlayer);
-                playerHead.setItemMeta(skullMeta);
-            }
-            
-            // Give the killer the head of the killed player
-            killer.getInventory().addItem(playerHead);
-        }
+		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		retrieveKilledPlayerHead(event);
 	}
 	
 	/**
@@ -51,6 +36,8 @@ public class PlayerManager implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
 		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
+			Player player = event.getPlayer();
+			player.getWorld().strikeLightningEffect(player.getLocation());
 			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		}
 	}
@@ -91,4 +78,25 @@ public class PlayerManager implements Listener {
         return target;
     }
 	
+	/*
+	 * If a Player kill another Player he receive the killedPlayer head as prize
+	 */
+	private void retrieveKilledPlayerHead(PlayerDeathEvent event) {
+		Player killedPlayer = event.getEntity().getPlayer();
+		// Check if the killer is a player
+        if (event.getEntity().getKiller() != null) {
+            // Get the player who was killed and the killer
+            Player killer = killedPlayer.getKiller();
+            
+            // Create the player head item
+            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
+            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+            if (skullMeta != null) {
+                skullMeta.setOwningPlayer(killedPlayer);
+                playerHead.setItemMeta(skullMeta);
+            }
+            // Give the killer the head of the killed player
+            killer.getInventory().addItem(playerHead);
+        }
+	}
 }
