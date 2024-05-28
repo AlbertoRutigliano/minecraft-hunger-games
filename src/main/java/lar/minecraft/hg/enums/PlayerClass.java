@@ -59,11 +59,13 @@ public enum PlayerClass {
         }
     };
 
-    private Sound sound;
+    private Sound sound = Sound.INTENTIONALLY_EMPTY;
 
     PlayerClass(Sound sound) {
         this.sound = sound;
     }
+    
+    PlayerClass() {}
 
     public Sound getSound() {
         return sound;
