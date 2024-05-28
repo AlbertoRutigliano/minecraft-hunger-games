@@ -1,4 +1,4 @@
-package lar.minecraft.hg;
+package lar.minecraft.hg.enums;
 
 public enum HGPhase {
 	WAITING_FOR_HG,

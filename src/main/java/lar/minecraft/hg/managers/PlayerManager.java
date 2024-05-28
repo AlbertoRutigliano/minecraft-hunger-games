@@ -1,6 +1,7 @@
 package lar.minecraft.hg.managers;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -10,6 +11,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import lar.minecraft.hg.SpigotPlugin;
 
@@ -21,9 +24,25 @@ public class PlayerManager implements Listener {
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event){
 		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-		Player deathPlayer = event.getEntity().getPlayer();
-		deathPlayer.setGameMode(GameMode.SPECTATOR);
-		// deathPlayer.kickPlayer("Si muert");
+		Player killedPlayer = event.getEntity().getPlayer();
+		killedPlayer.setGameMode(GameMode.SPECTATOR);
+		
+		// Check if the killer is a player
+        if (event.getEntity().getKiller() != null) {
+            // Get the player who was killed and the killer
+            Player killer = killedPlayer.getKiller();
+            
+            // Create the player head item
+            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
+            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+            if (skullMeta != null) {
+                skullMeta.setOwningPlayer(killedPlayer);
+                playerHead.setItemMeta(skullMeta);
+            }
+            
+            // Give the killer the head of the killed player
+            killer.getInventory().addItem(playerHead);
+        }
 	}
 	
 	/**
@@ -31,7 +50,9 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
-		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
+			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		}
 	}
 	
 	@EventHandler
@@ -43,6 +64,10 @@ public class PlayerManager implements Listener {
 		
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
+		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
+			event.getPlayer().setGameMode(GameMode.ADVENTURE);
+			event.getPlayer().playSound(event.getPlayer(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
+		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
 			event.setJoinMessage(null);
 			event.getPlayer().setGameMode(GameMode.SPECTATOR);

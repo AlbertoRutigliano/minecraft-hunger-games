@@ -8,36 +8,40 @@ website: ${url}
 main: ${mainClass}
 
 commands:
-    lobby:
+    test:
         description: An example command
-        permission: spigotplugin.lobby
-        usage: /<command>
-    nolobby:
-        description: An example command
-        permission: spigotplugin.nolobby
+        permission: perm.op
         usage: /<command>
     restart-hg-server:
         description: An example command
-        permission: spigotplugin.restart-hg-server
+        permission: perm.op
         usage: /<command>
     current-phase:
         description: An example command
-        permission: spigotplugin.current-phase
+        permission: perm.op
         usage: /<command>
     start-hg:
         description: An example command
-        permission: spigotplugin.start
+        permission: perm.op
         usage: /<command>
     bowman:
-        description: An example command
+        description: Shot other players with a bow and some arrows
         permission: perm.general
         usage: /<command>
     armored:
-        description: An example command
+        description: Cover yourself with a full iron armor set
         permission: perm.general
         usage: /<command>
     doglover:
-        description: An example command
+        description: Tame the nature and kill other players with your dog
+        permission: perm.general
+        usage: /<command>
+    lavaman:
+        description: Burn BURN BURN!!!
+        permission: perm.general
+        usage: /<command>
+    miner:
+        description: Dig in, my friend!
         permission: perm.general
         usage: /<command>
 permissions:

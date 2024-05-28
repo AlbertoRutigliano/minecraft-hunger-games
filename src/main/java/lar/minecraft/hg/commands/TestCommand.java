@@ -20,6 +20,10 @@ public class TestCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         String cmdName = cmd.getName().toLowerCase();
 
+        if (cmdName.equals("test")) {
+        	new ServerSchedulers(plugin).waitingPhase();
+        }
+        
         if (cmdName.equals("restart-hg-server")) {
         	ServerManager.restartServer();
         }
@@ -28,7 +32,7 @@ public class TestCommand implements CommandExecutor {
         	new ServerSchedulers(plugin).lobbyPhase();
         }
         
-        if (cmdName.equals("phase")) {
+        if (cmdName.equals("current-phase")) {
         	sender.sendMessage("Current phase is " + SpigotPlugin.getPhase());
         }
 
