@@ -40,6 +40,10 @@ commands:
         description: Burn BURN BURN!!!
         permission: perm.general
         usage: /<command>
+    miner:
+        description: Dig in, my friend!
+        permission: perm.general
+        usage: /<command>
 permissions:
    perm.general:
       default: true
