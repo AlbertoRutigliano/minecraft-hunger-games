@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Server;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import lar.minecraft.hg.commands.ClassCommand;
@@ -22,6 +23,8 @@ public class SpigotPlugin extends JavaPlugin {
 	
 	public static Server server;
 	
+	public static FileConfiguration config;
+	
 	public static HGPhase phase;
 	
 	public static int serverId;
@@ -29,6 +32,7 @@ public class SpigotPlugin extends JavaPlugin {
 	@Override
     public void onLoad() {
 		server = getServer();
+		config = getConfig();
 		saveDefaultConfig();
     }
 	

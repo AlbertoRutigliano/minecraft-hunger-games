@@ -1,5 +1,7 @@
 package lar.minecraft.hg;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -23,6 +25,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerClassManager;
@@ -257,13 +260,14 @@ public class ServerSchedulers {
 					}
 					SpigotPlugin.server.getScheduler().cancelTask(playingPhaseTaskId);
 				}
+        
 			}
 			
 			
 			
 		}, 20, 20); // 1 second = 20 ticks
 		
-		supplyDrop();
+		supplyDrop(config.getInt("chest-spawn-num", 3));
 		
 	}
 	
@@ -302,47 +306,56 @@ public class ServerSchedulers {
 		}, 20, 20); // 1 second = 20 ticks	
 	}
 	
-	private void supplyDrop() {
-		supplyDropTime = 0;
-		supplyDropTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
-			@Override
-			public void run() {
-				long execTime = world.getTime();
-				
-				// Spawn a supply drop chest after durations.supply-drop seconds
-				if (supplyDropTime == 0) {
-					supplyDropTime = execTime + (20 * config.getInt("durations.supply-drop", 10));
-				}
-				
-				long passedSeconds = (execTime - supplyDropTime) / 20;
-				
-				if (Math.abs(passedSeconds) <= 10) {
-					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
-						p.spigot().sendMessage(
-								ChatMessageType.ACTION_BAR, 
-								TextComponent.fromLegacyText("A supply drop chest will be spawned in " + Math.abs(passedSeconds) + " seconds."));
+	private void supplyDrop(int index) {
+		if (index > 0) {
+			supplyDropTime = 0;
+			supplyDropTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+				@Override
+				public void run() {
+					long execTime = world.getTime();
+					
+					// Spawn a supply drop chest after durations.supply-drop seconds
+					if (supplyDropTime == 0) {
+						// If is the first supply drop, get the first-supply-drop duration property 
+						if (index == config.getInt("chest-spawn-num", 3)) {
+							supplyDropTime = execTime + (20 * config.getInt("durations.first-supply-drop", 60));
+						} else {
+							supplyDropTime = execTime + (20 * config.getInt("durations.supply-drop", 10));
+						}
+					}
+					
+					long passedSeconds = (execTime - supplyDropTime) / 20;
+					
+					if (Math.abs(passedSeconds) <= 10) {
+						for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
+							p.spigot().sendMessage(
+									ChatMessageType.ACTION_BAR, 
+									TextComponent.fromLegacyText("A supply drop chest will be spawned in " + Math.abs(passedSeconds) + " seconds."));
+						}
+					}
+					
+					if (passedSeconds == 0) {
+						spawnSupplyDrop();
+						server.getScheduler().cancelTask(supplyDropTaskId);
+						supplyDrop(index-1);
 					}
 				}
 				
-				if (passedSeconds == 0) {
-					spawnSupplyDrop();
-					server.getScheduler().cancelTask(supplyDropTaskId);
-				}
-			}
+			}, 20, 20); // 1 second = 20 ticks
+		}
 			
-		}, 20, 20); // 1 second = 20 ticks	
 	}
 	
-	private static void spawnSupplyDrop() {
-		ServerManager.sendSound(Sound.BLOCK_BELL_USE);
-		
+	
+	public static void spawnSupplyDrop() {
 		// Get the spawn location
         Location spawnLocation = Bukkit.getWorld("world").getSpawnLocation();
 
         // Generate random offsets for X and Z coordinates
         Random random = new Random();
-        int offsetX = random.nextInt(21) - 10; // Random value between -10 and 10
-        int offsetZ = random.nextInt(21) - 10; // Random value between -10 and 10
+        int worldMaxSize = SpigotPlugin.config.getInt("world-border.max-size", 128);
+        int offsetX = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
+        int offsetZ = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
 
         // Apply offsets to the spawn location
         Location randomLocation = spawnLocation.clone().add(offsetX, 0, offsetZ);
@@ -358,12 +371,33 @@ public class ServerSchedulers {
         Chest chest = (Chest) block.getState();
         Inventory chestInventory = chest.getBlockInventory();
         
-        // Add items to the chest's inventory
-        chestInventory.addItem(new ItemStack(Material.DIAMOND, 5));
-        chestInventory.addItem(new ItemStack(Material.GOLD_INGOT, 10));
-        chestInventory.addItem(new ItemStack(Material.IRON_INGOT, 20));
+        do {
+        	// Items that can spawn in a chest
+            ArrayList<ItemStackProbability> items = new ArrayList<>();
+            items.add(new ItemStackProbability(Material.IRON_SWORD, 0.10));
+            items.add(new ItemStackProbability(Material.IRON_PICKAXE, 0.20));
+            items.add(new ItemStackProbability(Material.GRASS_BLOCK, 0.20, 8, 24));
+            items.add(new ItemStackProbability(Material.BREAD, 0.20, 6, 10));
+            items.add(new ItemStackProbability(Material.IRON_INGOT, 0.15, 5, 13));
+            items.add(new ItemStackProbability(Material.LAVA_BUCKET, 0.15));
+            items.add(new ItemStackProbability(Material.WATER_BUCKET, 0.15));
+            items.add(new ItemStackProbability(Material.DIAMOND_SWORD, 0.05));
+            items.add(new ItemStackProbability(Material.ENDER_PEARL, 0.25, 4, 12));
+
+            /* This code should add empty spaces in the chest but seems not working
+            int itemsToAdd = items.size();
+            for (int i = itemsToAdd; i < 27; i++) { // 27 is the max inventory size
+            	items.add(new ItemStackProbability(Material.AIR, 1.0)); // Add an empty slot
+            }*/
+            
+            Collections.shuffle(items);
+            items.forEach(i-> chestInventory.addItem(i));
+        } while (chestInventory.isEmpty()); // To make sure that the chest is not completely empty
         
+        ServerManager.sendSound(Sound.BLOCK_BELL_USE);
+        chest.getWorld().strikeLightning(chestLocation);
         Bukkit.broadcastMessage("Supply chest dropped at (x = " + chestLocation.getX() + ", y = " + chestLocation.getY() + ", z = " + chestLocation.getZ() + ")");
+	
 	}
 	
 }
