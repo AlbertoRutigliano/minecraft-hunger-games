@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import lar.minecraft.hg.MessageUtils;
 import lar.minecraft.hg.ServerSchedulers;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.managers.ServerManager;
@@ -21,7 +22,8 @@ public class TestCommand implements CommandExecutor {
         String cmdName = cmd.getName().toLowerCase();
 
         if (cmdName.equals("test")) {
-        	new ServerSchedulers(plugin).waitingPhase();
+        	sender.sendMessage(MessageUtils.getMessage(args[0], sender.getName()));
+        	//new ServerSchedulers(plugin).waitingPhase();
         }
         
         if (cmdName.equals("restart-hg-server")) {
@@ -38,6 +40,8 @@ public class TestCommand implements CommandExecutor {
 
         return true;
     }
+    
+   
     
 
 }
