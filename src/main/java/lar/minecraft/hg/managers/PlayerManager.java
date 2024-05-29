@@ -1,7 +1,12 @@
 package lar.minecraft.hg.managers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -15,9 +20,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import lar.minecraft.hg.SpigotPlugin;
+import lar.minecraft.hg.entities.PlayerExtra;
 
 public class PlayerManager implements Listener {
 
+	public static Map<UUID, PlayerExtra> playerExtras = new HashMap<>();
+	
+	private int winnerParticleEffectTaskId = 0;
+	
 	/**
 	 * Player death event
 	 */
@@ -26,6 +36,12 @@ public class PlayerManager implements Listener {
 		Player killedPlayer = event.getEntity().getPlayer();
 		killedPlayer.getWorld().strikeLightningEffect(killedPlayer.getLocation());
 		killedPlayer.setGameMode(GameMode.SPECTATOR);
+
+		// Stop reproducing particles of the winner player
+		if (PlayerManager.playerExtras.get(killedPlayer.getUniqueId()).isLastWinner()) {
+			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+		}
+
 		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		retrieveKilledPlayerHead(event);
 	}
@@ -40,8 +56,16 @@ public class PlayerManager implements Listener {
 			player.getWorld().strikeLightningEffect(player.getLocation());
 			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		}
+		// Stop reproducing particles of the winner player
+		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
+		if (playerExtra != null && playerExtra.isLastWinner()) {
+			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+		}
 	}
 	
+	/**
+	 * Player damage event
+	 */
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent event) {
 		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart()) {
@@ -52,8 +76,35 @@ public class PlayerManager implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
-			event.getPlayer().setGameMode(GameMode.ADVENTURE);
-			event.getPlayer().playSound(event.getPlayer(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
+			Player player = event.getPlayer();
+			
+			player.setGameMode(GameMode.ADVENTURE);
+			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
+			
+			// Check if the player is the winner of the last match or he is premium and create PlayerExtra to track it
+			String lastWinner = DatabaseManager.getLastWinner(SpigotPlugin.serverId);
+			boolean isLastWinner = false;
+			
+			if (!lastWinner.isEmpty()) {
+				isLastWinner = player.getUniqueId().compareTo(UUID.fromString(lastWinner)) == 0 ? true : false;
+				// TODO: migliorare il messaggio e UX
+				if (isLastWinner) {
+					player.sendMessage("Hai vinto l'ultimo round! Potrai scegliere una classe avanzata.");
+					
+					// Run a task to spawn particles effects to signal that he is the winner!
+					winnerParticleEffectTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+						@Override
+						public void run() {
+							if (PlayerManager.playerExtras.get(player.getUniqueId()).isLastWinner()) {
+								SpigotPlugin.server.getWorld(player.getWorld().getName()).spawnParticle(Particle.DRAGON_BREATH, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 40, -0.5, 0.5, -0.5, 0.01);
+							}
+						}
+					}, 20, 10); // 1 second = 20 ticks
+				}
+			}
+			boolean isPremium = DatabaseManager.isPlayerPremium(player.getUniqueId().toString());
+			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), isLastWinner, isPremium);
+			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
 			event.setJoinMessage(null);

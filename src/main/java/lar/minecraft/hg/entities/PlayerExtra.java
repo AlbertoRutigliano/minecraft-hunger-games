@@ -8,9 +8,21 @@ public class PlayerExtra {
 	
 	private UUID uuid;
 	private PlayerClass playerClass = null;
+	private boolean lastWinner = false;
+	private boolean premium = false;
 	
 	public PlayerExtra(UUID uuid) {
+		this(uuid, false);
+	}
+	
+	public PlayerExtra(UUID uuid, boolean lastWinner) {
+		this(uuid, lastWinner, false);
+	}
+	
+	public PlayerExtra(UUID uuid, boolean lastWinner, boolean premium) {
 		this.uuid = uuid;
+		this.lastWinner = lastWinner;
+		this.premium = premium;
 	}
 
 	public UUID getUuid() {
@@ -29,6 +41,22 @@ public class PlayerExtra {
 		this.playerClass = playerClass;
 	}
 
+	public boolean isLastWinner() {
+		return lastWinner;
+	}
+
+	public void setLastWinner(boolean lastWinner) {
+		this.lastWinner = lastWinner;
+	}
+
+	public boolean isPremium() {
+		return premium;
+	}
+
+	public void setPremium(boolean premium) {
+		this.premium = premium;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -53,6 +81,5 @@ public class PlayerExtra {
 			return false;
 		return true;
 	}
-	
-	
+
 }

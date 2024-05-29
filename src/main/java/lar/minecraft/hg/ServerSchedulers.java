@@ -181,6 +181,7 @@ public class ServerSchedulers {
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
 		server.setIdleTimeout(idleTimeout);
+		DatabaseManager.saveStartingDateTime(config.getInt("server.id", 1), currentHGGameId);
 		playingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();
@@ -249,6 +250,17 @@ public class ServerSchedulers {
 						SpigotPlugin.server.getScheduler().cancelTask(playingPhaseTaskId);
 					}
 				}
+				
+				// If there are no more players restart the game
+				// Used to prevent simultaneous disconnection or death of the remaining players
+				if (ServerManager.getLivingPlayers().size() == 0) {
+					SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+					if (config.getBoolean("server.auto-restart", false)) {
+						ServerManager.restartServer();
+					}
+					SpigotPlugin.server.getScheduler().cancelTask(playingPhaseTaskId);
+				}
+        
 			}
 			
 			

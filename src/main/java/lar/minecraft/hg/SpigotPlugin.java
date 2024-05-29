@@ -29,9 +29,6 @@ public class SpigotPlugin extends JavaPlugin {
 	
 	public static int serverId;
 	
-	public static Map<UUID, PlayerExtra> playerExtras = new HashMap<>();
-	
-	
 	@Override
     public void onLoad() {
 		server = getServer();

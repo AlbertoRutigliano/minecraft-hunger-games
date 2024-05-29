@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
 import lar.minecraft.hg.enums.PlayerClass;
+import lar.minecraft.hg.managers.PlayerManager;
 
 public class ClassCommand implements CommandExecutor {
 	
@@ -19,14 +20,19 @@ public class ClassCommand implements CommandExecutor {
 			Player player = (Player) sender;
 			if (SpigotPlugin.isLobby()) {
 				if (cmdName != null) {
+					PlayerExtra playerExtra = PlayerManager.playerExtras.get(player.getUniqueId());
 					
-					PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId());
-					playerExtra.setPlayerClass(cmdName);
-					SpigotPlugin.playerExtras.put(player.getUniqueId(), playerExtra);
-					
-					player.sendMessage("You will be a " + cmdName.name().toLowerCase() + "!");
-					player.playSound(player, cmdName.getSound(), 10.0f, 10.0f);
-					
+					// Check command selection: only premium users or who won last match can use premium classes
+					if (!cmdName.isPremium() || playerExtra.isPremium() || playerExtra.isLastWinner()) {
+					    playerExtra.setPlayerClass(cmdName);
+					    PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
+					    
+					    player.sendMessage("You will be a " + cmdName.name().toLowerCase() + "!");
+					    player.playSound(player, cmdName.getSound(), 10.0f, 10.0f);
+					} else {
+					    player.sendMessage("Choose another class.");
+					    player.sendMessage("You must win a match or be premium to use this class!");
+					}
 				} else {
 					player.sendMessage("There is no \"" + command.getName() + "\" class");
 				}
