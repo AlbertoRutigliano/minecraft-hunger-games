@@ -27,6 +27,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 
 import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.HGPhase;
+import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerClassManager;
 import lar.minecraft.hg.managers.PlayerManager;
@@ -330,7 +331,8 @@ public class ServerSchedulers {
 						for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 							p.spigot().sendMessage(
 									ChatMessageType.ACTION_BAR, 
-									TextComponent.fromLegacyText("A supply drop chest will be spawned in " + Math.abs(passedSeconds) + " seconds."));
+									TextComponent.fromLegacyText(MessageUtils.getMessage(MessageKey.supply_drop_alert, Math.abs(passedSeconds))));
+							
 						}
 					}
 					
@@ -396,8 +398,7 @@ public class ServerSchedulers {
         
         ServerManager.sendSound(Sound.BLOCK_BELL_USE);
         chest.getWorld().strikeLightning(chestLocation);
-        Bukkit.broadcastMessage("Supply chest dropped at (x = " + chestLocation.getX() + ", y = " + chestLocation.getY() + ", z = " + chestLocation.getZ() + ")");
-	
+        Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.supply_drop, chestLocation.getX(), chestLocation.getY(), chestLocation.getZ()));
 	}
 	
 }

@@ -39,6 +39,7 @@ public class SpigotPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Don't log enabling, Spigot does that for you automatically!
+    	MessageUtils.init();
     	
     	SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
     	

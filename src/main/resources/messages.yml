@@ -1,0 +1,9 @@
+#Use this site to color code generator: https://minecraftitemids.com/color-codes#generator 
+class_selection_lobby: "Class selection is available only in lobby"
+class_selected: 
+  - "You will be a &6{0}&7!"
+  - "You choose to be a &6{0}&7!"
+  - "&6{0}&7 class selected!"
+class_wrong: "There's no &6&m{0}&7 class"
+supply_drop_alert: "&fA &6supply drop chest &fwill be spawned in {0} seconds"
+supply_drop: "Supply chest dropped at XYZ:&2&o {0} / {1} / {2}"
