@@ -15,8 +15,8 @@ public class PlayerClassManager {
 			PlayerInventory playerInventory = player.getInventory();
 			playerInventory.clear();
 			playerInventory.addItem(new ItemStack(Material.COMPASS)); // Give a compass to all players
-			PlayerExtra playerExtra = SpigotPlugin.playerExtras.getOrDefault(player.getUniqueId(), null);
-			if (playerExtra != null) {
+			PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(player.getUniqueId(), null);
+			if (playerExtra != null && playerExtra.getPlayerClass() != null) {
 				playerExtra.getPlayerClass().getAction().perform(player); // Give class items to players who chosen a class
 			}
 			player.updateInventory();

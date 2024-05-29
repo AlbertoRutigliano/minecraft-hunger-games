@@ -76,6 +76,10 @@ public class DatabaseManager {
 		}
 	}
 	
+	/**
+	 * Prepare database necessary tables
+	 * @return 0 if everything is ok
+	 */
 	public static int createTables() {
 		if (isDatabaseEnabled()) {
 			try {
@@ -117,6 +121,22 @@ public class DatabaseManager {
 		}
 		
 		return 0;
+	}
+	
+	/**
+	 * Save game starting date time
+	 * @param ServerId
+	 * @param HGGameId
+	 */
+	public static void saveStartingDateTime(int ServerId, int HGGameId) {
+		if (isDatabaseEnabled()) {
+			try {
+				Statement statementUpdate = dbConnection.createStatement();
+				statementUpdate.executeUpdate(String.format("UPDATE hg_games SET game_start_datetime = NOW() WHERE server_id = %d AND id = %d;", ServerId, HGGameId));
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -171,6 +191,54 @@ public class DatabaseManager {
 		}
 	}
 
-
+	/**
+	 * Get the uuid of the player that won last match
+	 * @param serverId
+	 * @return Player uuid or string empty
+	 */
+	public static String getLastWinner(int ServerId){
+		if (isDatabaseEnabled()) {
+			try {
+				Statement statementRead = dbConnection.createStatement();
+				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT winner_uuid FROM hg_games WHERE server_id = %d ORDER BY game_start_datetime DESC LIMIT 1;", ServerId));
+				String winnerUUID = "";
+				
+				while (resultSet.next()) {
+					if (resultSet.getString("winner_uuid") != null) {
+						winnerUUID = resultSet.getString("winner_uuid");
+					}
+				}
+				return winnerUUID;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * Check if the player is Premium
+	 * @param playerUUID
+	 * @return true if player is premium, false if player is not premium or not exist
+	 */
+	public static boolean isPlayerPremium(String playerUUID){
+		if (isDatabaseEnabled()) {
+			try {
+				Statement statementRead = dbConnection.createStatement();
+				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT premium FROM players WHERE uuid = '%s';", playerUUID));
+				boolean isPremium = false;
+				
+				while (resultSet.next()) {
+					isPremium = resultSet.getBoolean("premium");
+				}
+				return isPremium;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
 }
 
