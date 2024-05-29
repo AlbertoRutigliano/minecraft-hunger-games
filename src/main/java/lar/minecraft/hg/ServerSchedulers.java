@@ -1,5 +1,7 @@
 package lar.minecraft.hg;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -23,6 +25,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerClassManager;
@@ -338,9 +341,9 @@ public class ServerSchedulers {
 
         // Generate random offsets for X and Z coordinates
         Random random = new Random();
-        int worldMaxSize = SpigotPlugin.config.getInt("max-size", 128);
-        int offsetX = random.nextInt(worldMaxSize+1) - worldMaxSize; // Random value between -worldMaxSize and worldMaxSize
-        int offsetZ = random.nextInt(worldMaxSize+1) - worldMaxSize; // Random value between -worldMaxSize and worldMaxSize
+        int worldMaxSize = SpigotPlugin.config.getInt("world-border.max-size", 128);
+        int offsetX = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
+        int offsetZ = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
 
         // Apply offsets to the spawn location
         Location randomLocation = spawnLocation.clone().add(offsetX, 0, offsetZ);
@@ -356,43 +359,33 @@ public class ServerSchedulers {
         Chest chest = (Chest) block.getState();
         Inventory chestInventory = chest.getBlockInventory();
         
-        // Add items to the chest's inventory
-        if (random.nextDouble() < 0.10) { // 10% chance
-            chestInventory.addItem(new ItemStack(Material.IRON_SWORD, 1));
-        }
-        if (random.nextDouble() < 0.20) { // 20% chance
-            chestInventory.addItem(new ItemStack(Material.IRON_PICKAXE, 1));
-        }
-        if (random.nextDouble() < 0.20) { // 20% chance
-        	chestInventory.addItem(new ItemStack(Material.GRASS_BLOCK, randomBetween(8, 24)));
-        }
-        if (random.nextDouble() < 0.20) { // 20% chance
-        	chestInventory.addItem(new ItemStack(Material.BREAD, randomBetween(6, 10)));
-        }
-        if (random.nextDouble() < 0.15) { // 15% chance
-        	chestInventory.addItem(new ItemStack(Material.IRON_INGOT, randomBetween(5, 13)));
-        }
-        if (random.nextDouble() < 0.15) { // 15% chance
-            chestInventory.addItem(new ItemStack(Material.LAVA_BUCKET, 1));
-        }
-        if (random.nextDouble() < 0.15) { // 15% chance
-            chestInventory.addItem(new ItemStack(Material.WATER_BUCKET, 1));
-        }
-        if (random.nextDouble() < 0.05) { // 5% chance
-            chestInventory.addItem(new ItemStack(Material.DIAMOND_SWORD, 1));
-        }
-        if (random.nextDouble() < 0.25) { // 15% chance
-        	chestInventory.addItem(new ItemStack(Material.ENDER_PEARL, randomBetween(4, 12)));
-        }
+        do {
+        	// Items that can spawn in a chest
+            ArrayList<ItemStackProbability> items = new ArrayList<>();
+            items.add(new ItemStackProbability(Material.IRON_SWORD, 0.10));
+            items.add(new ItemStackProbability(Material.IRON_PICKAXE, 0.20));
+            items.add(new ItemStackProbability(Material.GRASS_BLOCK, 0.20, 8, 24));
+            items.add(new ItemStackProbability(Material.BREAD, 0.20, 6, 10));
+            items.add(new ItemStackProbability(Material.IRON_INGOT, 0.15, 5, 13));
+            items.add(new ItemStackProbability(Material.LAVA_BUCKET, 0.15));
+            items.add(new ItemStackProbability(Material.WATER_BUCKET, 0.15));
+            items.add(new ItemStackProbability(Material.DIAMOND_SWORD, 0.05));
+            items.add(new ItemStackProbability(Material.ENDER_PEARL, 0.25, 4, 12));
+
+            /* This code should add empty spaces in the chest but seems not working
+            int itemsToAdd = items.size();
+            for (int i = itemsToAdd; i < 27; i++) { // 27 is the max inventory size
+            	items.add(new ItemStackProbability(Material.AIR, 1.0)); // Add an empty slot
+            }*/
+            
+            Collections.shuffle(items);
+            items.forEach(i-> chestInventory.addItem(i));
+        } while (chestInventory.isEmpty()); // To make sure that the chest is not completely empty
         
         ServerManager.sendSound(Sound.BLOCK_BELL_USE);
         chest.getWorld().strikeLightning(chestLocation);
         Bukkit.broadcastMessage("Supply chest dropped at (x = " + chestLocation.getX() + ", y = " + chestLocation.getY() + ", z = " + chestLocation.getZ() + ")");
 	
-	}
-	
-	private static int randomBetween(int min, int max) {
-		 return new Random().nextInt((max - min) + 1) + min;
 	}
 	
 }
