@@ -1,10 +1,10 @@
 # Minimum players to start the Hunger Games
-min-players: 3
+min-players: 2
 # Number of supply drop chest to spawn
 chest-spawn-num: 3
 durations:
   # Lobby phase duration in seconds where players can login and choose their class
-  lobby: 10
+  lobby: 30
   # Safe area duration in seconds where players can destroy blocks and collect items but cannot hit other players
   safe-area: 30
   # Winner celebrations duration in seconds
@@ -12,10 +12,10 @@ durations:
   # Fireworks celebrations duration in seconds
   fireworks: 15 
   # How many seconds after the start of the game (after safe-area phase) is the supply chest dropped
-  first-supply-drop: 10
+  first-supply-drop: 30
   # Interval seconds between every supply chest drop
   supply-drop: 60
-  # How many seconds a player can be stationary during the playing phase before getting kicked (minutes)
+  # How many minutes a player can be stationary during the playing phase before getting kicked
   idle-timeout: 2
 world-border:
   # Max world size dimension in blocks
