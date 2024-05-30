@@ -35,12 +35,12 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event){
-		Player killedPlayer = event.getEntity().getPlayer();
-		killedPlayer.getWorld().strikeLightningEffect(killedPlayer.getLocation());
-		killedPlayer.setGameMode(GameMode.SPECTATOR);
+		Player deathPlayer = event.getEntity().getPlayer();
+		deathPlayer.getWorld().strikeLightningEffect(deathPlayer.getLocation());
+		deathPlayer.setGameMode(GameMode.SPECTATOR);
 
 		// Stop reproducing particles of the winner player
-		if (PlayerManager.playerExtras.get(killedPlayer.getUniqueId()).isLastWinner()) {
+		if (PlayerManager.playerExtras.get(deathPlayer.getUniqueId()).isLastWinner()) {
 			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
 
