@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
 
 public class PlayerClassManager {

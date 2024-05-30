@@ -2,9 +2,6 @@ package lar.minecraft.hg;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Server;
@@ -13,7 +10,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import lar.minecraft.hg.commands.ClassCommand;
 import lar.minecraft.hg.commands.TestCommand;
-import lar.minecraft.hg.entities.PlayerExtra;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.managers.DatabaseManager;
