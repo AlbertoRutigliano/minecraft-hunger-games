@@ -1,5 +1,7 @@
 package lar.minecraft.hg.commands;
 
+import java.util.Arrays;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -7,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import lar.minecraft.hg.MessageUtils;
 import lar.minecraft.hg.ServerSchedulers;
 import lar.minecraft.hg.SpigotPlugin;
+import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.managers.ServerManager;
 
 public class TestCommand implements CommandExecutor {
@@ -36,6 +39,15 @@ public class TestCommand implements CommandExecutor {
         
         if (cmdName.equals("current-phase")) {
         	sender.sendMessage("Current phase is " + SpigotPlugin.getPhase());
+        }
+        Arrays.asList(MessageKey.values()).forEach( m -> {
+        	
+        });
+        
+        if (cmdName.equals("messages")) {
+        	Arrays.asList(MessageKey.values()).forEach( m -> {
+        		sender.sendMessage(MessageUtils.getMessage(m));
+            });
         }
 
         return true;

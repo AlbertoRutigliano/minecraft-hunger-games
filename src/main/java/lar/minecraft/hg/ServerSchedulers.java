@@ -86,7 +86,8 @@ public class ServerSchedulers {
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 						p.spigot().sendMessage(
 								ChatMessageType.ACTION_BAR, 
-								TextComponent.fromLegacyText("The game starts when the minimum number of players is reached: " + SpigotPlugin.server.getOnlinePlayers().size() + "/" + minimumPlayers));
+								TextComponent.fromLegacyText(
+										MessageUtils.getMessage(MessageKey.waiting_phase_min_players, SpigotPlugin.server.getOnlinePlayers().size(), minimumPlayers)));
 					}
 				} else {
 					lobbyPhase();

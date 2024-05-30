@@ -20,6 +20,10 @@ commands:
         description: An example command
         permission: perm.op
         usage: /<command>
+    messages:
+        description: An example command
+        permission: perm.op
+        usage: /<command>
     start-hg:
         description: An example command
         permission: perm.op

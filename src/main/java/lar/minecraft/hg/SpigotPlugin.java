@@ -59,6 +59,7 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("current-phase").setExecutor(new TestCommand(this));
         
         getCommand("test").setExecutor(new TestCommand(this));
+        getCommand("messages").setExecutor(new TestCommand(this));
         
         getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         

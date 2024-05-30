@@ -6,5 +6,6 @@ public enum MessageKey {
 	class_wrong,
 	supply_drop_alert,
 	supply_drop,
-	last_match_win
+	last_match_win,
+	waiting_phase_min_players
 }
