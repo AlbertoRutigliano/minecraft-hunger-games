@@ -89,7 +89,6 @@ public class PlayerManager implements Listener {
 			
 			if (!lastWinner.isEmpty()) {
 				isLastWinner = player.getUniqueId().compareTo(UUID.fromString(lastWinner)) == 0 ? true : false;
-				// TODO: migliorare il messaggio e UX
 				if (isLastWinner) {
 					player.sendMessage(MessageUtils.getMessage(MessageKey.last_match_win));
 					
