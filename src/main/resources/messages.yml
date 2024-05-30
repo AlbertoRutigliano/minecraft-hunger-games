@@ -7,3 +7,4 @@ class_selected:
 class_wrong: "There's no &6&m{0}&7 class"
 supply_drop_alert: "&fA &6supply drop chest &fwill be spawned in {0} seconds"
 supply_drop: "Supply chest dropped at XYZ:&2&o {0} / {1} / {2}"
+last_match_win: "You have &6won the last Hunger Games&7! In this game you can choose a &6premium class"

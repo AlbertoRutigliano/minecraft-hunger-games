@@ -19,8 +19,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import lar.minecraft.hg.MessageUtils;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
+import lar.minecraft.hg.enums.MessageKey;
 
 public class PlayerManager implements Listener {
 
@@ -89,7 +91,7 @@ public class PlayerManager implements Listener {
 				isLastWinner = player.getUniqueId().compareTo(UUID.fromString(lastWinner)) == 0 ? true : false;
 				// TODO: migliorare il messaggio e UX
 				if (isLastWinner) {
-					player.sendMessage("Hai vinto l'ultimo round! Potrai scegliere una classe avanzata.");
+					player.sendMessage(MessageUtils.getMessage(MessageKey.last_match_win));
 					
 					// Run a task to spawn particles effects to signal that he is the winner!
 					winnerParticleEffectTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {

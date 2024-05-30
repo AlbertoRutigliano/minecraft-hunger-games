@@ -5,5 +5,6 @@ public enum MessageKey {
 	class_selection_lobby,
 	class_wrong,
 	supply_drop_alert,
-	supply_drop
+	supply_drop,
+	last_match_win
 }
