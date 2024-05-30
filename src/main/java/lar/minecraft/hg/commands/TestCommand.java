@@ -5,12 +5,18 @@ import java.util.Arrays;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import lar.minecraft.hg.MessageUtils;
 import lar.minecraft.hg.ServerSchedulers;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.managers.ServerManager;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class TestCommand implements CommandExecutor {
     
@@ -25,7 +31,16 @@ public class TestCommand implements CommandExecutor {
         String cmdName = cmd.getName().toLowerCase();
 
         if (cmdName.equals("test")) {
-        	sender.sendMessage(MessageUtils.getMessage(args[0], sender.getName()));
+        	TextComponent message = new TextComponent("PROVOLA");
+        	message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/AlbertoRutigliano/minecraft-hunger-games"));
+        	message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Hello World")));
+        	sender.spigot().sendMessage(message);
+        	
+        	Player player = (Player) sender;
+        	player.spigot().sendMessage(
+					ChatMessageType.ACTION_BAR, 
+					new TextComponent(MessageUtils.getMessage(MessageKey.supply_drop, 0, 1, 2)));
+        	
         	//new ServerSchedulers(plugin).waitingPhase();
         }
         

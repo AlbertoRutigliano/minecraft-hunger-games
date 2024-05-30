@@ -86,8 +86,7 @@ public class ServerSchedulers {
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 						p.spigot().sendMessage(
 								ChatMessageType.ACTION_BAR, 
-								TextComponent.fromLegacyText(
-										MessageUtils.getMessage(MessageKey.waiting_phase_min_players, SpigotPlugin.server.getOnlinePlayers().size(), minimumPlayers)));
+								new TextComponent(MessageUtils.getMessage(MessageKey.waiting_phase_min_players, SpigotPlugin.server.getOnlinePlayers().size(), minimumPlayers)));					
 					}
 				} else {
 					lobbyPhase();
@@ -124,7 +123,7 @@ public class ServerSchedulers {
 				for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 					p.spigot().sendMessage(
 							ChatMessageType.ACTION_BAR, 
-							TextComponent.fromLegacyText("Game will start in " + Math.abs(passedSeconds) + " seconds"));
+							new TextComponent("Game will start in " + Math.abs(passedSeconds) + " seconds"));
 				}
 				if (passedSeconds == 0) {
 					safeAreaPhase();
@@ -143,7 +142,7 @@ public class ServerSchedulers {
 		
 		// Notify all players that Hunger Games is starting
 		ServerManager.getLivingPlayers().forEach(p -> {
-			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("It's starting the Hunger Games!"));
+			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_phase_alert)));
 			p.setGameMode(GameMode.SURVIVAL);
 			p.teleport(world.getSpawnLocation());
 			
@@ -162,13 +161,12 @@ public class ServerSchedulers {
 				}
 				long passedSeconds = (execTime - safeAreaTime) / 20;
 
-				ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
-						ChatMessageType.ACTION_BAR, 
-						TextComponent.fromLegacyText("Safe area expires in " + Math.abs(passedSeconds) + " seconds")));
+				ServerManager.getLivingPlayers().forEach(
+						p -> p.spigot().sendMessage(
+								ChatMessageType.ACTION_BAR, 
+								new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_expires_alert, Math.abs(passedSeconds))))
+						);
 				if (passedSeconds == 0) {
-					ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
-							ChatMessageType.ACTION_BAR, 
-							TextComponent.fromLegacyText("It's Hunger Games tiiiiiiiiime!")));
 					playingPhase();
 					server.getScheduler().cancelTask(safeAreaPhaseTaskId);
 				}
@@ -183,6 +181,9 @@ public class ServerSchedulers {
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
 		server.setIdleTimeout(idleTimeout);
+		ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
+				ChatMessageType.ACTION_BAR, 
+				new TextComponent(MessageUtils.getMessage(MessageKey.playing_phase_alert))));
 		DatabaseManager.saveStartingDateTime(config.getInt("server.id", 1), currentHGGameId);
 		playingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 			public void run() {
@@ -242,7 +243,7 @@ public class ServerSchedulers {
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 						p.spigot().sendMessage(
 								ChatMessageType.ACTION_BAR, 
-								TextComponent.fromLegacyText("A new Hunger Games will start in " + Math.abs(passedSeconds) + " seconds. Server will be restarted"));
+								new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_expires_alert, Math.abs(passedSeconds))));
 					}
 					if (passedSeconds == 0) {
 						SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
@@ -332,8 +333,7 @@ public class ServerSchedulers {
 						for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 							p.spigot().sendMessage(
 									ChatMessageType.ACTION_BAR, 
-									TextComponent.fromLegacyText(MessageUtils.getMessage(MessageKey.supply_drop_alert, Math.abs(passedSeconds))));
-							
+									new TextComponent(MessageUtils.getMessage(MessageKey.supply_drop_alert, Math.abs(passedSeconds))));
 						}
 					}
 					
