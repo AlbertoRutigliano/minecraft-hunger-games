@@ -52,7 +52,7 @@ public class TestCommand implements CommandExecutor {
         }
         
         if (cmdName.equals("current-phase")) {
-        	sender.sendMessage("Current phase is " + SpigotPlugin.getPhase());
+        	sender.sendMessage(MessageUtils.getMessage(MessageKey.current_phase, SpigotPlugin.getPhase()));
         }
         Arrays.asList(MessageKey.values()).forEach( m -> {
         	

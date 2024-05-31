@@ -34,37 +34,36 @@ public class SpigotPlugin extends JavaPlugin {
 	
     @Override
     public void onEnable() {
-        // Don't log enabling, Spigot does that for you automatically!
-    	MessageUtils.init();
-    	
-    	SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
-    	
     	serverId = getConfig().getInt("server.id");
-    	
     	server.getWorld("world").setDifficulty(Difficulty.NORMAL);
     	
     	// Create world border
     	server.getWorld("world").getWorldBorder().setCenter(server.getWorld("world").getSpawnLocation());
     	server.getWorld("world").getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
     	
+    	// Initialize MessageUtils for messages
+    	MessageUtils.init();
+    	
     	// Instantiate database connection and connect
     	new DatabaseManager(this, true);
     	
-        // Commands enabled with following method must have entries in plugin.yml
+        // Enable test commands
         getCommand("start-hg").setExecutor(new TestCommand(this));
         getCommand("current-phase").setExecutor(new TestCommand(this));
-        
+        getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         getCommand("test").setExecutor(new TestCommand(this));
         getCommand("messages").setExecutor(new TestCommand(this));
         
-        getCommand("restart-hg-server").setExecutor(new TestCommand(this));
-        
+        // Enable class selection commands
         Arrays.asList(PlayerClass.values()).forEach(c -> {
         	getCommand(c.name()).setExecutor(new ClassCommand());
         });
         
+        // Initialize PlayerManager listener
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
         
+        // Initialize Hunger Games waiting phase
+        SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
         if (getConfig().getBoolean("server.auto-start", true)) {
         	new ServerSchedulers(this).waitingPhase();
         }
@@ -73,7 +72,6 @@ public class SpigotPlugin extends JavaPlugin {
     
     @Override
     public void onDisable() {
-        // Don't log disabling, Spigot does that for you automatically!
     	try {
 			DatabaseManager.disconnectToDatabase();
 		} catch (ClassNotFoundException e) {

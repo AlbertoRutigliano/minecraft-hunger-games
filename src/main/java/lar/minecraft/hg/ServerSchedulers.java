@@ -33,8 +33,10 @@ public class ServerSchedulers {
 	private int worldBorderSize = 256;
 	private int worldBorderMinumumSize = 32;
 	private int idleTimeout = 2;
+	private SpigotPlugin plugin;
 	
 	public ServerSchedulers(SpigotPlugin plugin) {
+		this.plugin = plugin;
 		this.config = plugin.getConfig();
 		this.server = plugin.getServer();
 		this.world = server.getWorld("world");
@@ -64,11 +66,12 @@ public class ServerSchedulers {
 	
 	public void waitingPhase() {
 		SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+		plugin.getLogger().info(SpigotPlugin.getPhase().name());
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
 		});
-		waitingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+		waitingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			int minimumPlayers = config.getInt("min-players", 3);
 			@Override
 			public void run() {
@@ -90,12 +93,13 @@ public class ServerSchedulers {
 	
 	public void lobbyPhase() {
 		SpigotPlugin.setPhase(HGPhase.LOBBY);
+		plugin.getLogger().info(SpigotPlugin.getPhase().name());
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
 		});
 		gameStartTime = 0;
-		lobbyPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+		lobbyPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();
 				
@@ -125,11 +129,12 @@ public class ServerSchedulers {
 	
 	public void safeAreaPhase() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
-		safeAreaTime = 0;
-
+		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		
 		// Register new HungerGames game on Database
 		currentHGGameId = DatabaseManager.createHGGame(SpigotPlugin.serverId);
 		
+		safeAreaTime = 0;
 		// Notify all players that Hunger Games is starting
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_phase_alert)));
@@ -142,7 +147,7 @@ public class ServerSchedulers {
 		PlayerClassManager.giveClasses();
 		ServerManager.sendSound(Sound.EVENT_RAID_HORN);
 		
-		safeAreaPhaseTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+		safeAreaPhaseTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();
 				// First runnable run
@@ -168,6 +173,8 @@ public class ServerSchedulers {
 	
 	public void playingPhase() {
 		SpigotPlugin.setPhase(HGPhase.PLAYING);
+		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
 		server.setIdleTimeout(idleTimeout);
@@ -175,7 +182,7 @@ public class ServerSchedulers {
 				ChatMessageType.ACTION_BAR, 
 				new TextComponent(MessageUtils.getMessage(MessageKey.playing_phase_alert))));
 		DatabaseManager.saveStartingDateTime(config.getInt("server.id", 1), currentHGGameId);
-		playingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+		playingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();
 				
@@ -217,7 +224,6 @@ public class ServerSchedulers {
 				if (ServerManager.getLivingPlayers().size() == 1) {
 					// First runnable run
 					if(winnerCelebrationsTime == 0) {
-						SpigotPlugin.setPhase(HGPhase.WINNING);
 						Player winner = ServerManager.getLivingPlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
@@ -264,17 +270,12 @@ public class ServerSchedulers {
 		
 	}
 	
-	public static void currentPhaseLogger() {
-		SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
-			public void run() {
-				SpigotPlugin.server.getLogger().info("Phase: " + SpigotPlugin.getPhase().toString());
-			}
-		}, 20, 20); // 1 second = 20 ticks
-	}
-	
 	private void fireworkEffect(Player winner) {
+		SpigotPlugin.setPhase(HGPhase.WINNING);
+		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		
 		fireworksEffectsTime = 0;
-		fireworksEffectsTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+		fireworksEffectsTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			@Override
 			public void run() {
 				long execTime = world.getTime();
@@ -302,7 +303,7 @@ public class ServerSchedulers {
 	private void supplyDrop(int index) {
 		if (index > 0) {
 			supplyDropTime = 0;
-			supplyDropTaskId = server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+			supplyDropTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 				@Override
 				public void run() {
 					long execTime = world.getTime();

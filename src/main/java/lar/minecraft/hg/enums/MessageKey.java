@@ -1,6 +1,7 @@
 package lar.minecraft.hg.enums;
 
 public enum MessageKey {
+	current_phase,
 	class_selected,
 	class_selection_lobby,
 	class_wrong,
