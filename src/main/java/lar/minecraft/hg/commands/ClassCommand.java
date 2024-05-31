@@ -5,12 +5,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import lar.minecraft.hg.MessageUtils;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
 import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.managers.PlayerManager;
+import lar.minecraft.hg.utils.MessageUtils;
 
 public class ClassCommand implements CommandExecutor {
 

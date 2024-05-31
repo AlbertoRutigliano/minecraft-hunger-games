@@ -18,10 +18,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import lar.minecraft.hg.MessageUtils;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.MessageKey;
+import lar.minecraft.hg.utils.MessageUtils;
 
 public class ServerManager {
 		

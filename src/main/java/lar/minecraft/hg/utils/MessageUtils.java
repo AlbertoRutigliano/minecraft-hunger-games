@@ -1,4 +1,4 @@
-package lar.minecraft.hg;
+package lar.minecraft.hg.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.enums.MessageKey;
 
 public class MessageUtils {

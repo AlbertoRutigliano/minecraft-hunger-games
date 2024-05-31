@@ -22,6 +22,7 @@ import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerClassManager;
 import lar.minecraft.hg.managers.PlayerManager;
 import lar.minecraft.hg.managers.ServerManager;
+import lar.minecraft.hg.utils.MessageUtils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 

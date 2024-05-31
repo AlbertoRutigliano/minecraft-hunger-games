@@ -10,10 +10,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import lar.minecraft.hg.commands.ClassCommand;
 import lar.minecraft.hg.commands.TestCommand;
+import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerManager;
+import lar.minecraft.hg.utils.ConfigUtils;
+import lar.minecraft.hg.utils.MessageUtils;
 
 public class SpigotPlugin extends JavaPlugin {
 	
@@ -30,16 +33,19 @@ public class SpigotPlugin extends JavaPlugin {
 		server = getServer();
 		config = getConfig();
 		saveDefaultConfig();
+		ConfigUtils.setConfig(config);
     }
 	
     @Override
     public void onEnable() {
-    	serverId = getConfig().getInt("server.id");
+    	serverId = ConfigUtils.getInt(ConfigProperty.server_id);
+    	getLogger().info("Server id " + serverId);
+    	
     	server.getWorld("world").setDifficulty(Difficulty.NORMAL);
     	
     	// Create world border
     	server.getWorld("world").getWorldBorder().setCenter(server.getWorld("world").getSpawnLocation());
-    	server.getWorld("world").getWorldBorder().setSize(getConfig().getInt("world-border.max-size", 256));
+    	server.getWorld("world").getWorldBorder().setSize(ConfigUtils.getInt(ConfigProperty.world_border_max_size));
     	
     	// Initialize MessageUtils for messages
     	MessageUtils.init();
@@ -62,9 +68,9 @@ public class SpigotPlugin extends JavaPlugin {
         // Initialize PlayerManager listener
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
         
-        // Initialize Hunger Games waiting phase
         SpigotPlugin.setPhase(HGPhase.WAITING);
-        if (getConfig().getBoolean("server.auto-start", true)) {
+        // Initialize Hunger Games waiting phase
+        if (ConfigUtils.getBoolean(ConfigProperty.server_auto_start)) {
         	new ServerSchedulers(this).waitingPhase();
         }
         

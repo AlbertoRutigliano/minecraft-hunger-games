@@ -19,10 +19,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import lar.minecraft.hg.MessageUtils;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
 import lar.minecraft.hg.enums.MessageKey;
+import lar.minecraft.hg.utils.MessageUtils;
 
 public class PlayerManager implements Listener {
 
