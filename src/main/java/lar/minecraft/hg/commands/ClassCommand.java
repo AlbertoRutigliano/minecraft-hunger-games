@@ -20,17 +20,21 @@ public class ClassCommand implements CommandExecutor {
 
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if (cmdName != null && (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby())) {
+			if (cmdName != null && !PlayerManager.playerExtras.isEmpty() && (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby())) {
 				PlayerExtra playerExtra = PlayerManager.playerExtras.get(player.getUniqueId());
 
-				// Check command selection: only premium users or who won last match can use premium classes
-				if (!cmdName.isPremium() || playerExtra.isPremium() || playerExtra.isLastWinner()) {
-					playerExtra.setPlayerClass(cmdName);
-					PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
-					player.sendMessage(MessageUtils.getMessage(MessageKey.class_selected, cmdName.name()));
-					player.playSound(player, cmdName.getSound(), 10.0f, 10.0f);
+				if (playerExtra != null) {
+					// Check command selection: only premium users or who won last match can use premium classes
+					if (!cmdName.isPremium() || playerExtra.isPremium() || playerExtra.isLastWinner()) {
+						playerExtra.setPlayerClass(cmdName);
+						PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
+						player.sendMessage(MessageUtils.getMessage(MessageKey.class_selected, cmdName.name()));
+						player.playSound(player, cmdName.getSound(), 10.0f, 10.0f);
+					} else {
+						player.sendMessage(MessageUtils.getMessage(MessageKey.class_premium));
+					}
 				} else {
-					player.sendMessage(MessageUtils.getMessage(MessageKey.class_premium));
+					return false;
 				}
 			} else {
 				player.sendMessage(MessageUtils.getMessage(MessageKey.class_not_selected));
