@@ -16,12 +16,14 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerClassManager;
 import lar.minecraft.hg.managers.PlayerManager;
 import lar.minecraft.hg.managers.ServerManager;
+import lar.minecraft.hg.utils.ConfigUtils;
 import lar.minecraft.hg.utils.MessageUtils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -31,19 +33,18 @@ public class ServerSchedulers {
 	private FileConfiguration config;
 	private World world;
 	private Server server;
-	private int worldBorderSize = 256;
-	private int worldBorderMinumumSize = 32;
-	private int idleTimeout = 2;
+	private int worldBorderSize;
+	private int minimumPlayers;
 	private SpigotPlugin plugin;
+	
 	
 	public ServerSchedulers(SpigotPlugin plugin) {
 		this.plugin = plugin;
 		this.config = plugin.getConfig();
 		this.server = plugin.getServer();
 		this.world = server.getWorld("world");
-		this.worldBorderSize = config.getInt("world-border.max-size", worldBorderSize);
-		this.worldBorderMinumumSize = config.getInt("world-border.min-size", worldBorderMinumumSize);
-		this.idleTimeout = config.getInt("durations.idle-timeout");
+		this.worldBorderSize = ConfigUtils.getInt(ConfigProperty.world_border_max_size);
+		this.minimumPlayers = ConfigUtils.getInt(ConfigProperty.min_players);
 	}
 	
 	private static int currentHGGameId = 0;
@@ -73,7 +74,6 @@ public class ServerSchedulers {
 			p.getInventory().clear();
 		});
 		waitingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
-			int minimumPlayers = config.getInt("min-players", 3);
 			@Override
 			public void run() {
 				if (SpigotPlugin.server.getOnlinePlayers().size() < minimumPlayers) {
@@ -104,7 +104,6 @@ public class ServerSchedulers {
 			public void run() {
 				long execTime = world.getTime();
 				
-				int minimumPlayers = config.getInt("min-players", 3);
 				if (SpigotPlugin.server.getOnlinePlayers().size() < minimumPlayers) {
 					waitingPhase();
 					server.getScheduler().cancelTask(lobbyPhaseTaskId);
@@ -178,7 +177,7 @@ public class ServerSchedulers {
 		
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
-		server.setIdleTimeout(idleTimeout);
+		server.setIdleTimeout(ConfigUtils.getInt(ConfigProperty.duration_idle_timeout));
 		ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
 				ChatMessageType.ACTION_BAR, 
 				new TextComponent(MessageUtils.getMessage(MessageKey.playing_phase_alert))));
@@ -194,7 +193,7 @@ public class ServerSchedulers {
 				}
 				long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
 				if(passedSecondsForWorldBorderCollapse == 0) {
-					if (worldBorderSize > config.getInt("world-border.min-size", 32)) {
+					if (worldBorderSize > ConfigUtils.getInt(ConfigProperty.world_border_min_size)) {
 						worldBorderSize = worldBorderSize - WORLD_BORDER_COLLAPSE_RADIUS;
 						world.getWorldBorder().setSize(worldBorderSize, WORLD_BORDER_COLLAPSE_COUNTER_SECONDS);
 						world.getWorldBorder().setDamageBuffer(0);
