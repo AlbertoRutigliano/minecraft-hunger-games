@@ -20,7 +20,9 @@ import org.bukkit.inventory.Inventory;
 
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.ItemStackProbability;
+import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.MessageKey;
+import lar.minecraft.hg.utils.ConfigUtils;
 import lar.minecraft.hg.utils.MessageUtils;
 
 public class ServerManager {
@@ -52,7 +54,7 @@ public class ServerManager {
 
         // Generate random offsets for X and Z coordinates
         Random random = new Random();
-        int worldMaxSize = SpigotPlugin.config.getInt("world-border.max-size", 128);
+        int worldMaxSize = ConfigUtils.getInt(ConfigProperty.world_border_max_size);
         int offsetX = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
         int offsetZ = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
 
