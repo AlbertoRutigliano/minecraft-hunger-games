@@ -66,7 +66,7 @@ public class ServerSchedulers {
 	
 	public void waitingPhase() {
 		SpigotPlugin.setPhase(HGPhase.WAITING);
-		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
@@ -93,7 +93,7 @@ public class ServerSchedulers {
 	
 	public void lobbyPhase() {
 		SpigotPlugin.setPhase(HGPhase.LOBBY);
-		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
@@ -129,7 +129,7 @@ public class ServerSchedulers {
 	
 	public void safeAreaPhase() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
-		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		
 		// Register new HungerGames game on Database
 		currentHGGameId = DatabaseManager.createHGGame(SpigotPlugin.serverId);
@@ -173,7 +173,7 @@ public class ServerSchedulers {
 	
 	public void playingPhase() {
 		SpigotPlugin.setPhase(HGPhase.PLAYING);
-		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
@@ -272,7 +272,7 @@ public class ServerSchedulers {
 	
 	private void fireworkEffect(Player winner) {
 		SpigotPlugin.setPhase(HGPhase.WINNING);
-		plugin.getLogger().info(SpigotPlugin.getPhase().name());
+		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		
 		fireworksEffectsTime = 0;
 		fireworksEffectsTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {

@@ -5,5 +5,10 @@ public enum HGPhase {
 	LOBBY,
 	SAFE_AREA,
 	PLAYING,
-	WINNING
+	WINNING;
+	
+	@Override
+	public String toString() {
+		return this.name().toLowerCase();
+	}
 }
