@@ -40,8 +40,7 @@ public class TestCommand implements CommandExecutor {
         	player.spigot().sendMessage(
 					ChatMessageType.ACTION_BAR, 
 					new TextComponent(MessageUtils.getMessage(MessageKey.supply_drop, 0, 1, 2)));
-        	
-        	//new ServerSchedulers(plugin).waitingPhase();
+
         }
         
         if (cmdName.equals("restart-hg-server")) {
@@ -49,7 +48,7 @@ public class TestCommand implements CommandExecutor {
         }
                 
         if (cmdName.equals("start-hg")) {
-        	new ServerSchedulers(plugin).lobbyPhase();
+        	new ServerSchedulers(plugin).waitingPhase();
         }
         
         if (cmdName.equals("current-phase")) {

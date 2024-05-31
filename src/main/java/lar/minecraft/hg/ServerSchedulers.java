@@ -1,31 +1,21 @@
 package lar.minecraft.hg;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 
-import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.managers.DatabaseManager;
@@ -338,7 +328,7 @@ public class ServerSchedulers {
 					}
 					
 					if (passedSeconds == 0) {
-						spawnSupplyDrop();
+						ServerManager.spawnSupplyDrop();
 						server.getScheduler().cancelTask(supplyDropTaskId);
 						supplyDrop(index-1);
 					}
@@ -347,59 +337,6 @@ public class ServerSchedulers {
 			}, 20, 20); // 1 second = 20 ticks
 		}
 			
-	}
-	
-	
-	public static void spawnSupplyDrop() {
-		// Get the spawn location
-        Location spawnLocation = Bukkit.getWorld("world").getSpawnLocation();
-
-        // Generate random offsets for X and Z coordinates
-        Random random = new Random();
-        int worldMaxSize = SpigotPlugin.config.getInt("world-border.max-size", 128);
-        int offsetX = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
-        int offsetZ = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
-
-        // Apply offsets to the spawn location
-        Location randomLocation = spawnLocation.clone().add(offsetX, 0, offsetZ);
-
-        // Find the highest block at the random location
-        Location chestLocation = randomLocation.getWorld().getHighestBlockAt(randomLocation).getLocation().add(0, 1, 0);;
-        
-        // Create a chest block at the spawn location
-        Block block = chestLocation.getBlock();
-        block.setType(Material.CHEST);
-        
-        // Get the chest's inventory
-        Chest chest = (Chest) block.getState();
-        Inventory chestInventory = chest.getBlockInventory();
-        
-        do {
-        	// Items that can spawn in a chest
-            ArrayList<ItemStackProbability> items = new ArrayList<>();
-            items.add(new ItemStackProbability(Material.IRON_SWORD, 0.10));
-            items.add(new ItemStackProbability(Material.IRON_PICKAXE, 0.20));
-            items.add(new ItemStackProbability(Material.GRASS_BLOCK, 0.20, 8, 24));
-            items.add(new ItemStackProbability(Material.BREAD, 0.20, 6, 10));
-            items.add(new ItemStackProbability(Material.IRON_INGOT, 0.15, 5, 13));
-            items.add(new ItemStackProbability(Material.LAVA_BUCKET, 0.15));
-            items.add(new ItemStackProbability(Material.WATER_BUCKET, 0.15));
-            items.add(new ItemStackProbability(Material.DIAMOND_SWORD, 0.05));
-            items.add(new ItemStackProbability(Material.ENDER_PEARL, 0.25, 4, 12));
-
-            /* This code should add empty spaces in the chest but seems not working
-            int itemsToAdd = items.size();
-            for (int i = itemsToAdd; i < 27; i++) { // 27 is the max inventory size
-            	items.add(new ItemStackProbability(Material.AIR, 1.0)); // Add an empty slot
-            }*/
-            
-            Collections.shuffle(items);
-            items.forEach(i-> chestInventory.addItem(i));
-        } while (chestInventory.isEmpty()); // To make sure that the chest is not completely empty
-        
-        ServerManager.sendSound(Sound.BLOCK_BELL_USE);
-        chest.getWorld().strikeLightning(chestLocation);
-        Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.supply_drop, chestLocation.getX(), chestLocation.getY(), chestLocation.getZ()));
 	}
 	
 }

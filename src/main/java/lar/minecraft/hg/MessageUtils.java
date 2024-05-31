@@ -68,6 +68,6 @@ public class MessageUtils {
         for (int i = 0; i < placeholders.length; i++) {
             message = message.replace("{" + i + "}", String.valueOf(placeholders[i]));
         }
-        return ChatColor.translateAlternateColorCodes('&', "&7" + message);
+        return ChatColor.translateAlternateColorCodes('&', message);
     }
 }
