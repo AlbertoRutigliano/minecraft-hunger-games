@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,24 +29,18 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ServerSchedulers {
 
-	private FileConfiguration config;
-	private World world;
-	private Server server;
-	private int worldBorderSize;
-	private int minimumPlayers;
-	private SpigotPlugin plugin;
-	
-	
-	public ServerSchedulers(SpigotPlugin plugin) {
-		this.plugin = plugin;
-		this.config = plugin.getConfig();
-		this.server = plugin.getServer();
-		this.world = server.getWorld("world");
-		this.worldBorderSize = ConfigUtils.getInt(ConfigProperty.world_border_max_size);
-		this.minimumPlayers = ConfigUtils.getInt(ConfigProperty.min_players);
-	}
-	
+	private static World world;
+	private static Server server;
+	private static SpigotPlugin plugin;
+	private static int worldBorderSize = ConfigUtils.getInt(ConfigProperty.world_border_max_size);
+	private static int minPlayers = ConfigUtils.getInt(ConfigProperty.min_players);
 	private static int currentHGGameId = 0;
+	
+	public static void init(SpigotPlugin plugin) {
+		ServerSchedulers.plugin = plugin;
+		ServerSchedulers.server = plugin.getServer();
+		ServerSchedulers.world = server.getWorld("world");
+	}
 	
 	private static long gameStartTime = 0;
 	private static long safeAreaTime = 0;
@@ -63,10 +56,7 @@ public class ServerSchedulers {
 	private static int fireworksEffectsTaskId = -1;
 	private static int supplyDropTaskId = -1;
 	
-	private final static int WORLD_BORDER_COLLAPSE_COUNTER_SECONDS = 60; // TODO May be added on config.yml
-	private final static int WORLD_BORDER_COLLAPSE_RADIUS = 20; // TODO May be added on config.yml
-	
-	public void waitingPhase() {
+	public static void waitingPhase() {
 		SpigotPlugin.setPhase(HGPhase.WAITING);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		ServerManager.getLivingPlayers().forEach(p -> {
@@ -76,11 +66,11 @@ public class ServerSchedulers {
 		waitingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			@Override
 			public void run() {
-				if (SpigotPlugin.server.getOnlinePlayers().size() < minimumPlayers) {
+				if (SpigotPlugin.server.getOnlinePlayers().size() < minPlayers) {
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 						p.spigot().sendMessage(
 								ChatMessageType.ACTION_BAR, 
-								new TextComponent(MessageUtils.getMessage(MessageKey.waiting_phase_min_players, SpigotPlugin.server.getOnlinePlayers().size(), minimumPlayers)));					
+								new TextComponent(MessageUtils.getMessage(MessageKey.waiting_phase_min_players, SpigotPlugin.server.getOnlinePlayers().size(), minPlayers)));					
 					}
 				} else {
 					lobbyPhase();
@@ -92,7 +82,7 @@ public class ServerSchedulers {
 		}, 20, 20); // 1 second = 20 ticks
 	}
 	
-	public void lobbyPhase() {
+	public static void lobbyPhase() {
 		SpigotPlugin.setPhase(HGPhase.LOBBY);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		ServerManager.getLivingPlayers().forEach(p -> {
@@ -104,14 +94,14 @@ public class ServerSchedulers {
 			public void run() {
 				long execTime = world.getTime();
 				
-				if (SpigotPlugin.server.getOnlinePlayers().size() < minimumPlayers) {
+				if (SpigotPlugin.server.getOnlinePlayers().size() < minPlayers) {
 					waitingPhase();
 					server.getScheduler().cancelTask(lobbyPhaseTaskId);
 				}
 				
 				// First runnable run
 				if (gameStartTime == 0) {
-					gameStartTime = execTime + (20 * config.getInt("durations.lobby", 30)); // Game will start in X seconds
+					gameStartTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_lobby)); // Game will start in X seconds
 				}
 				long passedSeconds = (execTime - gameStartTime) / 20;
 				for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
@@ -127,7 +117,7 @@ public class ServerSchedulers {
 		}, 20, 20); // 1 second = 20 ticks
 	}
 	
-	public void safeAreaPhase() {
+	public static void safeAreaPhase() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		
@@ -142,7 +132,7 @@ public class ServerSchedulers {
 			p.teleport(world.getSpawnLocation());
 			
 			// Write player join on Database
-			DatabaseManager.addPlayerJoin(config.getInt("server.id", 1), currentHGGameId, p);
+			DatabaseManager.addPlayerJoin(ConfigUtils.getInt(ConfigProperty.server_id), currentHGGameId, p);
 		});
 		PlayerClassManager.giveClasses();
 		ServerManager.sendSound(Sound.EVENT_RAID_HORN);
@@ -152,7 +142,7 @@ public class ServerSchedulers {
 				long execTime = world.getTime();
 				// First runnable run
 				if (safeAreaTime == 0) {
-					safeAreaTime = execTime + (20 * config.getInt("durations.safe-area", 40));
+					safeAreaTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_safe_area));
 				}
 				long passedSeconds = (execTime - safeAreaTime) / 20;
 
@@ -171,7 +161,7 @@ public class ServerSchedulers {
 		
 	}
 	
-	public void playingPhase() {
+	public static void playingPhase() {
 		SpigotPlugin.setPhase(HGPhase.PLAYING);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		
@@ -181,7 +171,7 @@ public class ServerSchedulers {
 		ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
 				ChatMessageType.ACTION_BAR, 
 				new TextComponent(MessageUtils.getMessage(MessageKey.playing_phase_alert))));
-		DatabaseManager.saveStartingDateTime(config.getInt("server.id", 1), currentHGGameId);
+		DatabaseManager.saveStartingDateTime(ConfigUtils.getInt(ConfigProperty.server_id), currentHGGameId);
 		playingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();
@@ -189,13 +179,13 @@ public class ServerSchedulers {
 				// WORLD BORDER COLLAPSE
 				// First runnable run
 				if(worldBorderCollapseTime == 0) {
-					worldBorderCollapseTime = execTime + (20 * WORLD_BORDER_COLLAPSE_COUNTER_SECONDS);
+					worldBorderCollapseTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
 				}
 				long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
 				if(passedSecondsForWorldBorderCollapse == 0) {
 					if (worldBorderSize > ConfigUtils.getInt(ConfigProperty.world_border_min_size)) {
-						worldBorderSize = worldBorderSize - WORLD_BORDER_COLLAPSE_RADIUS;
-						world.getWorldBorder().setSize(worldBorderSize, WORLD_BORDER_COLLAPSE_COUNTER_SECONDS);
+						worldBorderSize = worldBorderSize - ConfigUtils.getInt(ConfigProperty.world_border_collapse_radius);
+						world.getWorldBorder().setSize(worldBorderSize, ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
 						world.getWorldBorder().setDamageBuffer(0);
 						world.getWorldBorder().setDamageAmount(0.2);
 						worldBorderCollapseTime = 0; 
@@ -227,10 +217,10 @@ public class ServerSchedulers {
 						Player winner = ServerManager.getLivingPlayers().iterator().next();
 						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
-						winnerCelebrationsTime = execTime + (20 * config.getInt("durations.winner-celebrations", 20));
+						winnerCelebrationsTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_winner_celebrations));
 
 						// Save the winning player on Database
-						DatabaseManager.savePlayerWin(config.getInt("server.id", 1), currentHGGameId, winner);
+						DatabaseManager.savePlayerWin(ConfigUtils.getInt(ConfigProperty.server_id), currentHGGameId, winner);
 						fireworkEffect(winner);
 					}
 					
@@ -243,7 +233,7 @@ public class ServerSchedulers {
 					}
 					if (passedSeconds == 0) {
 						SpigotPlugin.setPhase(HGPhase.WAITING);
-						if (config.getBoolean("server.auto-restart", false)) {
+						if (ConfigUtils.getBoolean(ConfigProperty.server_auto_restart)) {
 							ServerManager.restartServer();
 						}
 						SpigotPlugin.server.getScheduler().cancelTask(playingPhaseTaskId);
@@ -254,7 +244,7 @@ public class ServerSchedulers {
 				// Used to prevent simultaneous disconnection or death of the remaining players
 				if (ServerManager.getLivingPlayers().size() == 0) {
 					SpigotPlugin.setPhase(HGPhase.WAITING);
-					if (config.getBoolean("server.auto-restart", false)) {
+					if (ConfigUtils.getBoolean(ConfigProperty.server_auto_restart)) {
 						ServerManager.restartServer();
 					}
 					SpigotPlugin.server.getScheduler().cancelTask(playingPhaseTaskId);
@@ -266,11 +256,11 @@ public class ServerSchedulers {
 			
 		}, 20, 20); // 1 second = 20 ticks
 		
-		supplyDrop(config.getInt("chest-spawn-num", 3));
+		supplyDrop(ConfigUtils.getInt(ConfigProperty.chest_spawn_num));
 		
 	}
 	
-	private void fireworkEffect(Player winner) {
+	private static void fireworkEffect(Player winner) {
 		SpigotPlugin.setPhase(HGPhase.WINNING);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
 		
@@ -280,7 +270,7 @@ public class ServerSchedulers {
 			public void run() {
 				long execTime = world.getTime();
 				if (fireworksEffectsTime == 0) {
-					fireworksEffectsTime = execTime + (20 * config.getInt("durations.fireworks", 20));
+					fireworksEffectsTime = execTime + (20 *ConfigUtils.getInt(ConfigProperty.duration_fireworks));
 				}
 				long passedSeconds = (execTime - fireworksEffectsTime) / 20;
 				
@@ -300,7 +290,7 @@ public class ServerSchedulers {
 		}, 20, 20); // 1 second = 20 ticks	
 	}
 	
-	private void supplyDrop(int index) {
+	private static void supplyDrop(int index) {
 		if (index > 0) {
 			supplyDropTime = 0;
 			supplyDropTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
@@ -311,10 +301,10 @@ public class ServerSchedulers {
 					// Spawn a supply drop chest after durations.supply-drop seconds
 					if (supplyDropTime == 0) {
 						// If is the first supply drop, get the first-supply-drop duration property 
-						if (index == config.getInt("chest-spawn-num", 3)) {
-							supplyDropTime = execTime + (20 * config.getInt("durations.first-supply-drop", 60));
+						if (index == ConfigUtils.getInt(ConfigProperty.chest_spawn_num)) {
+							supplyDropTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_first_supply_drop));
 						} else {
-							supplyDropTime = execTime + (20 * config.getInt("durations.supply-drop", 10));
+							supplyDropTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_supply_drop));
 						}
 					}
 					

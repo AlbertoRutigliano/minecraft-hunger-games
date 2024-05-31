@@ -1,15 +1,18 @@
 package lar.minecraft.hg.managers;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import lar.minecraft.hg.SpigotPlugin;
+import lar.minecraft.hg.enums.ConfigProperty;
+import lar.minecraft.hg.utils.ConfigUtils;
 
 public class DatabaseManager {
 	
-	private static FileConfiguration config;
 	private static boolean databaseEnabled = false;
 	private static String dbConnectionString;
 	private static String dbUser;
@@ -20,15 +23,14 @@ public class DatabaseManager {
 		return databaseEnabled;
 	}
 
-	public DatabaseManager(SpigotPlugin plugin, boolean directlyConnect) {
-		config = plugin.getConfig();
-		databaseEnabled = config.getBoolean("database.enable", false);
+	public DatabaseManager(boolean directlyConnect) {
+		databaseEnabled = ConfigUtils.getBoolean(ConfigProperty.database_enable);
 		
 		// Directly connect to database when creating Database Manager
 		if (isDatabaseEnabled()) {
-			dbConnectionString = config.getString("database.connection-string");
-			dbUser = config.getString("database.db-user");
-			dbPassword = config.getString("database.db-password");
+			dbConnectionString = ConfigUtils.getString(ConfigProperty.database_connection_string); 
+			dbUser = ConfigUtils.getString(ConfigProperty.database_user);
+			dbPassword = ConfigUtils.getString(ConfigProperty.database_password);
 			
 			if (directlyConnect) {
 				try {

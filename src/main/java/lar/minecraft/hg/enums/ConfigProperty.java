@@ -17,6 +17,8 @@ public enum ConfigProperty {
 	// World border
 	world_border_max_size("world-border.max-size", 128), // Max world size dimension in blocks
 	world_border_min_size("world-border.min-size", 2), // Min world size dimension in blocks
+	world_border_collapse_counter_seconds("world-border.collapse-counter-seconds", 60), // How many seconds to reduce world border by collapse-radius value
+	world_border_collapse_radius("world-border.collapse-radius", 20), // World border collapse radius
 	
 	// Server
 	server_id("server.id", 27), // Server ID
@@ -26,8 +28,8 @@ public enum ConfigProperty {
 	// Database
 	database_enable("database.enable", false), // Enable and connect to a database to save Hunger Games information and statistics
 	database_connection_string("database.connection-string", "jdbc:mysql://127.0.0.1:3306/hunger_games"), // Connection string for the database
-	database_user("database.db-user", "test"), // Database connection user credentials
-	database_password("database.db-password", "test"); // Database connection user credentials
+	database_user("database.user", "test"), // Database connection user credentials
+	database_password("database.password", "test"); // Database connection user credentials
 
 	private String key;
 	private Object defaultValue;

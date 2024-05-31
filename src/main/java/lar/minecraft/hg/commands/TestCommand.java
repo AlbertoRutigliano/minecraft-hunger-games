@@ -48,7 +48,7 @@ public class TestCommand implements CommandExecutor {
         }
                 
         if (cmdName.equals("start-hg")) {
-        	new ServerSchedulers(plugin).waitingPhase();
+        	ServerSchedulers.waitingPhase();
         }
         
         if (cmdName.equals("current-phase")) {

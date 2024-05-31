@@ -34,6 +34,7 @@ public class SpigotPlugin extends JavaPlugin {
 		config = getConfig();
 		saveDefaultConfig();
 		ConfigUtils.setConfig(config);
+		ServerSchedulers.init(this);
     }
 	
     @Override
@@ -51,7 +52,7 @@ public class SpigotPlugin extends JavaPlugin {
     	MessageUtils.init();
     	
     	// Instantiate database connection and connect
-    	new DatabaseManager(this, true);
+    	new DatabaseManager(true);
     	
         // Enable test commands
         getCommand("start-hg").setExecutor(new TestCommand(this));
@@ -71,7 +72,7 @@ public class SpigotPlugin extends JavaPlugin {
         SpigotPlugin.setPhase(HGPhase.WAITING);
         // Initialize Hunger Games waiting phase
         if (ConfigUtils.getBoolean(ConfigProperty.server_auto_start)) {
-        	new ServerSchedulers(this).waitingPhase();
+        	ServerSchedulers.waitingPhase();
         }
         
     }

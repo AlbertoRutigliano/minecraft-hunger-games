@@ -22,6 +22,10 @@ world-border:
   max-size: 128
   # Min world size dimension in blocks
   min-size: 2
+  # How many seconds to reduce world border by collapse-radius value
+  collapse-counter-seconds: 60
+  # World border collapse radius
+  collapse-radius: 20
 server:
   id: 1
   # When server is started, automatically start a new Hunger Games session
@@ -34,5 +38,5 @@ database:
   # Connection string for the database
   connection-string: jdbc:mysql://51.38.125.46:3306/hunger_games
   # Database Connection user credentials
-  db-user: test
-  db-password: test
+  user: test
+  password: test
