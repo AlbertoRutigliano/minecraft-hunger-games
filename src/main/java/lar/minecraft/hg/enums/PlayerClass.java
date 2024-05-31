@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public enum PlayerClass {
-	MINER (Sound.ENTITY_ITEM_BREAK, false) {
+	miner (Sound.ENTITY_ITEM_BREAK, false) {
 		@Override
 		public PlayerAction getAction() {
 			return (player) -> {
@@ -16,7 +16,7 @@ public enum PlayerClass {
             };
 		}
 	},
-    BOWMAN (Sound.ITEM_CROSSBOW_HIT, false) {
+    bowman (Sound.ITEM_CROSSBOW_HIT, false) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -24,7 +24,7 @@ public enum PlayerClass {
             };
         }
     },
-    ARMORED (Sound.ITEM_ARMOR_EQUIP_LEATHER, true) {
+    armored (Sound.ITEM_ARMOR_EQUIP_LEATHER, true) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -36,7 +36,7 @@ public enum PlayerClass {
             };
         }
     },
-    DOGLOVER (Sound.ENTITY_WOLF_PANT, false) {
+    doglover (Sound.ENTITY_WOLF_PANT, false) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -49,7 +49,7 @@ public enum PlayerClass {
             };
         }
     },
-    LAVAMAN (Sound.ITEM_BUCKET_FILL_LAVA, false) {
+    lavaman (Sound.ITEM_BUCKET_FILL_LAVA, false) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {

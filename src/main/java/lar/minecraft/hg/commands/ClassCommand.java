@@ -16,7 +16,7 @@ public class ClassCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		PlayerClass cmdName = PlayerClass.valueOf(command.getName().toUpperCase());
+		PlayerClass cmdName = PlayerClass.valueOf(command.getName().toLowerCase());
 
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
@@ -27,7 +27,7 @@ public class ClassCommand implements CommandExecutor {
 				if (!cmdName.isPremium() || playerExtra.isPremium() || playerExtra.isLastWinner()) {
 					playerExtra.setPlayerClass(cmdName);
 					PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
-					player.sendMessage(MessageUtils.getMessage(MessageKey.class_selected, cmdName.name().toLowerCase()));
+					player.sendMessage(MessageUtils.getMessage(MessageKey.class_selected, cmdName.name()));
 					player.playSound(player, cmdName.getSound(), 10.0f, 10.0f);
 				} else {
 					player.sendMessage(MessageUtils.getMessage(MessageKey.class_premium));

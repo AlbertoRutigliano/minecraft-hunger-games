@@ -65,7 +65,7 @@ public class ServerSchedulers {
 	private final static int WORLD_BORDER_COLLAPSE_RADIUS = 20; // TODO May be added on config.yml
 	
 	public void waitingPhase() {
-		SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+		SpigotPlugin.setPhase(HGPhase.WAITING);
 		plugin.getLogger().info(SpigotPlugin.getPhase().name());
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
@@ -242,7 +242,7 @@ public class ServerSchedulers {
 								new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_expires_alert, Math.abs(passedSeconds))));
 					}
 					if (passedSeconds == 0) {
-						SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+						SpigotPlugin.setPhase(HGPhase.WAITING);
 						if (config.getBoolean("server.auto-restart", false)) {
 							ServerManager.restartServer();
 						}
@@ -253,7 +253,7 @@ public class ServerSchedulers {
 				// If there are no more players restart the game
 				// Used to prevent simultaneous disconnection or death of the remaining players
 				if (ServerManager.getLivingPlayers().size() == 0) {
-					SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+					SpigotPlugin.setPhase(HGPhase.WAITING);
 					if (config.getBoolean("server.auto-restart", false)) {
 						ServerManager.restartServer();
 					}

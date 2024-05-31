@@ -63,7 +63,7 @@ public class SpigotPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);
         
         // Initialize Hunger Games waiting phase
-        SpigotPlugin.setPhase(HGPhase.WAITING_FOR_HG);
+        SpigotPlugin.setPhase(HGPhase.WAITING);
         if (getConfig().getBoolean("server.auto-start", true)) {
         	new ServerSchedulers(this).waitingPhase();
         }
@@ -102,7 +102,7 @@ public class SpigotPlugin extends JavaPlugin {
     }
     
     public static boolean isWaitingForStart() {
-    	return phase.equals(HGPhase.WAITING_FOR_HG);
+    	return phase.equals(HGPhase.WAITING);
     }
     
     public static boolean isPlaying() {
