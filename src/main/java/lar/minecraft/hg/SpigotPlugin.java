@@ -39,9 +39,6 @@ public class SpigotPlugin extends JavaPlugin {
 	
     @Override
     public void onEnable() {
-    	serverId = ConfigUtils.getInt(ConfigProperty.server_id);
-    	getLogger().info("Server id " + serverId);
-    	
     	server.getWorld("world").setDifficulty(Difficulty.NORMAL);
     	
     	// Create world border

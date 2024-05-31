@@ -23,6 +23,10 @@ public class DatabaseManager {
 		return databaseEnabled;
 	}
 
+	/*
+	 * TODO Maybe can be used init method as was done for ServerSchedulers. 
+	 * Maybe also we can remove "directlyConnect" boolean variable because never really used: if it's false, what happen?
+	 */
 	public DatabaseManager(boolean directlyConnect) {
 		databaseEnabled = ConfigUtils.getBoolean(ConfigProperty.database_enable);
 		
@@ -101,6 +105,10 @@ public class DatabaseManager {
 	 * Save the information of the new match
 	 * @param serverId
 	 * @return the new hg game Id
+	 */
+	/**
+	 * TODO The serverId parameter can be removed from all methods of the DatabaseManager class. 
+	 * We can directly use server.id taken from configuration files with this instruction: ConfigUtils.getInt(ConfigProperty.server_id)
 	 */
 	public static int createHGGame(int ServerId){
 		if (isDatabaseEnabled()) {
