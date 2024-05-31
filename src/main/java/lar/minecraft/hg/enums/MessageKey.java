@@ -10,6 +10,7 @@ public enum MessageKey {
 	supply_drop,
 	last_match_win,
 	waiting_phase_min_players,
+	lobby_phase_expires_alert,
 	safe_area_phase_alert,
 	safe_area_expires_alert,
 	playing_phase_alert,

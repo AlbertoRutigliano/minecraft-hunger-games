@@ -113,7 +113,7 @@ public class ServerSchedulers {
 				for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 					p.spigot().sendMessage(
 							ChatMessageType.ACTION_BAR, 
-							new TextComponent("Game will start in " + Math.abs(passedSeconds) + " seconds"));
+							new TextComponent(MessageUtils.getMessage(MessageKey.lobby_phase_expires_alert, Math.abs(passedSeconds))));
 				}
 				if (passedSeconds == 0) {
 					safeAreaPhase();
