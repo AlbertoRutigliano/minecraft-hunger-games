@@ -122,10 +122,6 @@ public class DatabaseManager {
 	 * @param serverId
 	 * @return the new hg game Id
 	 */
-	/**
-	 * TODO The serverId parameter can be removed from all methods of the DatabaseManager class. 
-	 * We can directly use server.id taken from configuration files with this instruction: ConfigUtils.getInt(ConfigProperty.server_id)
-	 */
 	public static int createHGGame(int ServerId){
 		if (isDatabaseEnabled()) {
 			try {
