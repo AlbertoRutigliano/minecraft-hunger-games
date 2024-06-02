@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import lar.minecraft.hg.commands.ClassCommand;
+import lar.minecraft.hg.commands.ScoreboardCommand;
 import lar.minecraft.hg.commands.TestCommand;
 import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.HGPhase;
@@ -48,8 +49,12 @@ public class SpigotPlugin extends JavaPlugin {
     	// Initialize MessageUtils for messages
     	MessageUtils.init();
     	
-    	// Instantiate database connection and connect
-    	new DatabaseManager(true);
+    	// Initiate DB connection and connect to database
+    	boolean databaseEnabled = ConfigUtils.getBoolean(ConfigProperty.database_enable);
+		String dbConnectionString = ConfigUtils.getString(ConfigProperty.database_connection_string); 
+		String dbUser = ConfigUtils.getString(ConfigProperty.database_user);
+		String dbPassword = ConfigUtils.getString(ConfigProperty.database_password);
+    	DatabaseManager.Init(databaseEnabled, dbConnectionString, dbUser, dbPassword);
     	
         // Enable test commands
         getCommand("start-hg").setExecutor(new TestCommand(this));
@@ -57,6 +62,10 @@ public class SpigotPlugin extends JavaPlugin {
         getCommand("restart-hg-server").setExecutor(new TestCommand(this));
         getCommand("test").setExecutor(new TestCommand(this));
         getCommand("messages").setExecutor(new TestCommand(this));
+        
+        // Enable game commands
+        getCommand("scoreboard").setExecutor(new ScoreboardCommand());
+		getCommand("scoreboard").setTabCompleter(new ScoreboardCommand());
         
         // Enable class selection commands
         Arrays.asList(PlayerClass.values()).forEach(c -> {
