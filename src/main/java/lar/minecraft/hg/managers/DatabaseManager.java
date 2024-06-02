@@ -33,7 +33,7 @@ public class DatabaseManager {
 	 * @param dbUser Database user (user must have permission to create tables and views)
 	 * @param dbPassword Database user password
 	 */
-	public static void Init(boolean databaseEnabled, String connectionString, String dbUser, String dbPassword) {
+	public static void init(boolean databaseEnabled, String connectionString, String dbUser, String dbPassword) {
 		DatabaseManager.databaseEnabled = databaseEnabled;
 		
 		// Set static fields and connect to database
@@ -104,7 +104,7 @@ public class DatabaseManager {
 											+ "     count(`hunger_games`.`hg_games`.`winner_uuid`) AS `wins_count`"
 											+ " from"
 											+ "     (`hunger_games`.`hg_games`"
-											+ " join `hunger_games`.`players` on"
+											+ " right outer join `hunger_games`.`players` on"
 											+ "     ((`hunger_games`.`players`.`uuid` = `hunger_games`.`hg_games`.`winner_uuid`)))"
 											+ " group by"
 											+ "     `hunger_games`.`hg_games`.`winner_uuid`);");

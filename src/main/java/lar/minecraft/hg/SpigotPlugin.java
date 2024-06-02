@@ -1,10 +1,15 @@
 package lar.minecraft.hg;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Properties;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,26 +30,37 @@ public class SpigotPlugin extends JavaPlugin {
 	
 	public static FileConfiguration config;
 	
-	public static HGPhase phase;
+	public static Properties serverProps = new Properties();
 	
-	public static int serverId;
+	public static HGPhase phase = HGPhase.WAITING;
 	
-	@Override
-    public void onLoad() {
-		server = getServer();
-		config = getConfig();
-		saveDefaultConfig();
-		ConfigUtils.setConfig(config);
-		ServerSchedulers.init(this);
-    }
+	public static int serverId = 0;
+	
+	public static World world;
 	
     @Override
     public void onEnable() {
-    	server.getWorld("world").setDifficulty(Difficulty.NORMAL);
+		server = getServer();
+		
+		try {
+			serverProps.load(new FileInputStream("server.properties"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		world = server.getWorld(serverProps.getProperty("level-name"));
+		config = getConfig();
+		saveDefaultConfig();
+		ConfigUtils.setConfig(config);
+		
+		ServerSchedulers.init(this);
+    	serverId = ConfigUtils.getInt(ConfigProperty.server_id);
+    	world.setDifficulty(Difficulty.NORMAL);
     	
     	// Create world border
-    	server.getWorld("world").getWorldBorder().setCenter(server.getWorld("world").getSpawnLocation());
-    	server.getWorld("world").getWorldBorder().setSize(ConfigUtils.getInt(ConfigProperty.world_border_max_size));
+    	world.getWorldBorder().setCenter(world.getSpawnLocation());
+    	world.getWorldBorder().setSize(ConfigUtils.getInt(ConfigProperty.world_border_max_size));
     	
     	// Initialize MessageUtils for messages
     	MessageUtils.init();
@@ -54,7 +70,7 @@ public class SpigotPlugin extends JavaPlugin {
 		String dbConnectionString = ConfigUtils.getString(ConfigProperty.database_connection_string); 
 		String dbUser = ConfigUtils.getString(ConfigProperty.database_user);
 		String dbPassword = ConfigUtils.getString(ConfigProperty.database_password);
-    	DatabaseManager.Init(databaseEnabled, dbConnectionString, dbUser, dbPassword);
+    	DatabaseManager.init(databaseEnabled, dbConnectionString, dbUser, dbPassword);
     	
         // Enable test commands
         getCommand("start-hg").setExecutor(new TestCommand(this));

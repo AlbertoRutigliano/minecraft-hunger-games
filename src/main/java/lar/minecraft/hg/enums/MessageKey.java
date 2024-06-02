@@ -16,5 +16,6 @@ public enum MessageKey {
 	safe_area_expires_alert,
 	playing_phase_alert,
 	server_to_restart_alert,
-	scoreboard_list_header
+	scoreboard_list_header,
+	wins_the_hunger_games
 }

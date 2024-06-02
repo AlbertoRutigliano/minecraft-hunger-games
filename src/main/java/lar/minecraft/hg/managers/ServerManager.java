@@ -50,7 +50,7 @@ public class ServerManager {
 	
 	public static void spawnSupplyDrop() {
 		// Get the spawn location
-        Location spawnLocation = Bukkit.getWorld("world").getSpawnLocation();
+        Location spawnLocation = SpigotPlugin.world.getSpawnLocation();
 
         // Generate random offsets for X and Z coordinates
         Random random = new Random();

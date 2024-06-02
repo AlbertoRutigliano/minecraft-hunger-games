@@ -39,7 +39,7 @@ public class ServerSchedulers {
 	public static void init(SpigotPlugin plugin) {
 		ServerSchedulers.plugin = plugin;
 		ServerSchedulers.server = plugin.getServer();
-		ServerSchedulers.world = server.getWorld("world");
+		ServerSchedulers.world = SpigotPlugin.world;
 	}
 	
 	private static long gameStartTime = 0;
@@ -132,7 +132,7 @@ public class ServerSchedulers {
 			p.teleport(world.getSpawnLocation());
 			
 			// Write player join on Database
-			DatabaseManager.addPlayerJoin(ConfigUtils.getInt(ConfigProperty.server_id), currentHGGameId, p);
+			DatabaseManager.addPlayerJoin(SpigotPlugin.serverId, currentHGGameId, p);
 		});
 		PlayerClassManager.giveClasses();
 		ServerManager.sendSound(Sound.EVENT_RAID_HORN);
@@ -168,10 +168,10 @@ public class ServerSchedulers {
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
 		server.setIdleTimeout(ConfigUtils.getInt(ConfigProperty.duration_idle_timeout));
-		ServerManager.getLivingPlayers().forEach(p -> p.spigot().sendMessage(
-				ChatMessageType.ACTION_BAR, 
-				new TextComponent(MessageUtils.getMessage(MessageKey.playing_phase_alert))));
-		DatabaseManager.saveStartingDateTime(ConfigUtils.getInt(ConfigProperty.server_id), currentHGGameId);
+		ServerManager.getLivingPlayers()
+			.forEach(p -> p.sendTitle(MessageUtils.getMessage(MessageKey.playing_phase_alert), null, 10, 100, 10));
+		
+		DatabaseManager.saveStartingDateTime(SpigotPlugin.serverId, currentHGGameId);
 		playingPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 			public void run() {
 				long execTime = world.getTime();
@@ -215,12 +215,12 @@ public class ServerSchedulers {
 					// First runnable run
 					if(winnerCelebrationsTime == 0) {
 						Player winner = ServerManager.getLivingPlayers().iterator().next();
-						SpigotPlugin.server.broadcastMessage(winner.getName() + " wins the Hunger Games!");
+						SpigotPlugin.server.broadcastMessage(MessageUtils.getMessage(MessageKey.wins_the_hunger_games, winner.getName()));
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_winner_celebrations));
 
 						// Save the winning player on Database
-						DatabaseManager.savePlayerWin(ConfigUtils.getInt(ConfigProperty.server_id), currentHGGameId, winner);
+						DatabaseManager.savePlayerWin(SpigotPlugin.serverId, currentHGGameId, winner);
 						fireworkEffect(winner);
 					}
 					
@@ -229,7 +229,7 @@ public class ServerSchedulers {
 					for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
 						p.spigot().sendMessage(
 								ChatMessageType.ACTION_BAR, 
-								new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_expires_alert, Math.abs(passedSeconds))));
+								new TextComponent(MessageUtils.getMessage(MessageKey.server_to_restart_alert, Math.abs(passedSeconds))));
 					}
 					if (passedSeconds == 0) {
 						SpigotPlugin.setPhase(HGPhase.WAITING);
