@@ -30,54 +30,6 @@ public class PlayerManager implements Listener {
 	
 	private int winnerParticleEffectTaskId = 0;
 	
-	/**
-	 * Player death event
-	 */
-	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent event){
-		Player deathPlayer = event.getEntity().getPlayer();
-		deathPlayer.getWorld().strikeLightningEffect(deathPlayer.getLocation());
-		deathPlayer.setGameMode(GameMode.SPECTATOR);
-
-		// Stop reproducing particles of the winner player
-		if (PlayerManager.playerExtras.get(deathPlayer.getUniqueId()).isLastWinner()) {
-			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
-		}
-
-		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-		retrieveKilledPlayerHead(event);
-	}
-	
-	/**
-	 * Player quit event
-	 */
-	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event){
-		if (SpigotPlugin.isWinning() || SpigotPlugin.isLobby()) { 
-			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
-		}
-		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
-			Player player = event.getPlayer();
-			player.getWorld().strikeLightningEffect(player.getLocation());
-			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-		}
-		// Stop reproducing particles of the winner player
-		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
-		if (playerExtra != null && playerExtra.isLastWinner()) {
-			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
-		}
-	}
-	
-	/**
-	 * Player damage event
-	 */
-	@EventHandler
-	public void onPlayerDamage(EntityDamageEvent event) {
-		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart()) {
-			event.setCancelled(true);
-		}
-	}
-	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
@@ -114,6 +66,54 @@ public class PlayerManager implements Listener {
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
 			event.setJoinMessage(null);
 			event.getPlayer().setGameMode(GameMode.SPECTATOR);
+		}
+	}
+	
+	/**
+	 * Player damage event
+	 */
+	@EventHandler
+	public void onPlayerDamage(EntityDamageEvent event) {
+		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart()) {
+			event.setCancelled(true);
+		}
+	}
+	
+	/**
+	 * Player death event
+	 */
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent event){
+		Player deathPlayer = event.getEntity().getPlayer();
+		deathPlayer.getWorld().strikeLightningEffect(deathPlayer.getLocation());
+		deathPlayer.setGameMode(GameMode.SPECTATOR);
+
+		// Stop reproducing particles of the winner player
+		if (PlayerManager.playerExtras.get(deathPlayer.getUniqueId()).isLastWinner()) {
+			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+		}
+
+		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		retrieveKilledPlayerHead(event);
+	}
+	
+	/**
+	 * Player quit event
+	 */
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event){
+		if (SpigotPlugin.isWinning() || SpigotPlugin.isLobby()) { 
+			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
+		}
+		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
+			Player player = event.getPlayer();
+			player.getWorld().strikeLightningEffect(player.getLocation());
+			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		}
+		// Stop reproducing particles of the winner player
+		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
+		if (playerExtra != null && playerExtra.isLastWinner()) {
+			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
 	}
 	
