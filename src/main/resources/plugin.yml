@@ -28,6 +28,12 @@ commands:
         description: An example command
         permission: perm.op
         usage: /<command>
+    scoreboard:
+        description: Show players that won the most match
+        permission: perm.general
+        usage:
+          /<command> Show current game players that won the most match
+          /<command> global Show global players that won the most match
     bowman:
         description: Shot other players with a bow and some arrows
         permission: perm.general

@@ -5,11 +5,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.entity.Player;
-
-import lar.minecraft.hg.enums.ConfigProperty;
-import lar.minecraft.hg.utils.ConfigUtils;
 
 public class DatabaseManager {
 	
@@ -22,26 +21,31 @@ public class DatabaseManager {
 	public static boolean isDatabaseEnabled() {
 		return databaseEnabled;
 	}
+	
+	public static String getDbConnectionString() {
+		return dbConnectionString;
+	}
 
-	/*
-	 * TODO Maybe can be used init method as was done for ServerSchedulers. 
-	 * Maybe also we can remove "directlyConnect" boolean variable because never really used: if it's false, what happen?
+	/**
+	 * Initiate DB connection and connect to database
+	 * @param databaseEnabled If true a Database connection will be instantiated with the passed parameters
+	 * @param connectionString Database connection String
+	 * @param dbUser Database user (user must have permission to create tables and views)
+	 * @param dbPassword Database user password
 	 */
-	public DatabaseManager(boolean directlyConnect) {
-		databaseEnabled = ConfigUtils.getBoolean(ConfigProperty.database_enable);
+	public static void Init(boolean databaseEnabled, String connectionString, String dbUser, String dbPassword) {
+		DatabaseManager.databaseEnabled = databaseEnabled;
 		
-		// Directly connect to database when creating Database Manager
+		// Set static fields and connect to database
 		if (isDatabaseEnabled()) {
-			dbConnectionString = ConfigUtils.getString(ConfigProperty.database_connection_string); 
-			dbUser = ConfigUtils.getString(ConfigProperty.database_user);
-			dbPassword = ConfigUtils.getString(ConfigProperty.database_password);
+			DatabaseManager.dbConnectionString = connectionString; 
+			DatabaseManager.dbUser = dbUser;
+			DatabaseManager.dbPassword = dbPassword;
 			
-			if (directlyConnect) {
-				try {
-					connectToDatabase();
-				} catch (ClassNotFoundException | SQLException e) {
-					e.printStackTrace();
-				}
+			try {
+				connectToDatabase();
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -90,9 +94,21 @@ public class DatabaseManager {
 		if (isDatabaseEnabled()) {
 			try {
 				Statement statementCreate = dbConnection.createStatement();
-				statementCreate.executeUpdate(String.format("CREATE TABLE IF NOT EXISTS hg_games (server_id int NOT NULL, id int NOT NULL, winner_uuid varchar(100), win_datetime datetime)"));
-				statementCreate.executeUpdate(String.format("CREATE TABLE IF NOT EXISTS played_hg_games (server_id int NOT NULL, id int NOT NULL, player_uuid varchar(100))"));
-				statementCreate.executeUpdate(String.format("CREATE TABLE IF NOT EXISTS players (uuid varchar(100), name varchar(100))"));
+				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS hg_games (server_id int NOT NULL, id int NOT NULL, winner_uuid varchar(100), win_datetime datetime)");
+				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS played_hg_games (server_id int NOT NULL, id int NOT NULL, player_uuid varchar(100))");
+				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS players (uuid varchar(100), name varchar(100))");
+				statementCreate.executeUpdate("CREATE OR REPLACE"
+											+ " ALGORITHM = UNDEFINED VIEW `hunger_games`.`v_Scoreboard` AS ("
+											+ " select"
+											+ "     `hunger_games`.`players`.`name` AS `name`,"
+											+ "     count(`hunger_games`.`hg_games`.`winner_uuid`) AS `wins_count`"
+											+ " from"
+											+ "     (`hunger_games`.`hg_games`"
+											+ " join `hunger_games`.`players` on"
+											+ "     ((`hunger_games`.`players`.`uuid` = `hunger_games`.`hg_games`.`winner_uuid`)))"
+											+ " group by"
+											+ "     `hunger_games`.`hg_games`.`winner_uuid`);");
+				statementCreate.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -123,7 +139,10 @@ public class DatabaseManager {
 					hgGameId = foundRows + 1;
 				}
 				statementInsert.executeUpdate(String.format("INSERT INTO hg_games (server_id, id) VALUES (%d, %d);", ServerId, hgGameId));
-	
+
+				statementRead.close();
+				statementInsert.close();
+				
 				return hgGameId;
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -143,6 +162,7 @@ public class DatabaseManager {
 			try {
 				Statement statementUpdate = dbConnection.createStatement();
 				statementUpdate.executeUpdate(String.format("UPDATE hg_games SET game_start_datetime = NOW() WHERE server_id = %d AND id = %d;", ServerId, HGGameId));
+				statementUpdate.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -178,6 +198,8 @@ public class DatabaseManager {
 						statementInsert.executeUpdate(String.format("INSERT INTO played_hg_games (server_id, id, player_uuid) VALUES ('%d', '%d', '%s');", ServerId, HGGameId, player.getUniqueId(), player.getName()));
 					}
 				}
+				statementRead.close();
+				statementInsert.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -195,6 +217,7 @@ public class DatabaseManager {
 			try {
 				Statement statementUpdate = dbConnection.createStatement();
 				statementUpdate.executeUpdate(String.format("UPDATE hg_games SET winner_uuid = '%s', win_datetime = NOW() WHERE server_id = %d AND id = %d", player.getUniqueId().toString(), ServerId, HGGameId));
+				statementUpdate.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -218,6 +241,8 @@ public class DatabaseManager {
 						winnerUUID = resultSet.getString("winner_uuid");
 					}
 				}
+				statementRead.close();
+				
 				return winnerUUID;
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -242,6 +267,8 @@ public class DatabaseManager {
 				while (resultSet.next()) {
 					isPremium = resultSet.getBoolean("premium");
 				}
+				statementRead.close();
+				
 				return isPremium;
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -249,6 +276,57 @@ public class DatabaseManager {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Get count of match that player has won
+	 * @param playerUUID
+	 * @return Count of match that player has won
+	 */
+	public static int getPlayerWinCount(String playerUUID) {
+		if (isDatabaseEnabled()) {
+			try {
+				Statement statementRead = dbConnection.createStatement();
+				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT COUNT(winner_uuid) AS winCount FROM hg_games WHERE winner_uuid = '%s';", playerUUID));
+				int winCount = 0;
+				
+				while (resultSet.next()) {
+					winCount = resultSet.getInt("winCount");
+				}
+				statementRead.close();
+				
+				return winCount;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return 0;
+	}
+	
+	/**
+	 * Get all players win count
+	 * @return Map made up of players names and win count ordered by win count from highest to lowest
+	 */
+	public static Map<String, Integer> getGlobalScoreboard() {
+		Map<String, Integer> result = new HashMap<>();
+		if (isDatabaseEnabled()) {
+			try {
+				Statement statementRead = dbConnection.createStatement();
+				ResultSet resultSet = statementRead.executeQuery("SELECT name, wins_count FROM v_Scoreboard ORDER BY wins_count");
+				
+				while (resultSet.next()) {
+					result.put(resultSet.getString("name"), resultSet.getInt("wins_count"));
+				}
+				statementRead.close();
+				
+				return result;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 }
 

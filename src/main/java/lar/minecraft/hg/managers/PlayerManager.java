@@ -53,6 +53,9 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
+		if (SpigotPlugin.isWinning() || SpigotPlugin.isLobby()) { 
+			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
+		}
 		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
 			Player player = event.getPlayer();
 			player.getWorld().strikeLightningEffect(player.getLocation());
@@ -74,7 +77,7 @@ public class PlayerManager implements Listener {
 			event.setCancelled(true);
 		}
 	}
-		
+	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
@@ -104,7 +107,8 @@ public class PlayerManager implements Listener {
 				}
 			}
 			boolean isPremium = DatabaseManager.isPlayerPremium(player.getUniqueId().toString());
-			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), isLastWinner, isPremium);
+			int winCount = DatabaseManager.getPlayerWinCount(player.getUniqueId().toString());
+			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), player.getName(), isLastWinner, isPremium, winCount);
 			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {

@@ -15,5 +15,6 @@ public enum MessageKey {
 	safe_area_phase_alert,
 	safe_area_expires_alert,
 	playing_phase_alert,
-	server_to_restart_alert
+	server_to_restart_alert,
+	scoreboard_list_header
 }

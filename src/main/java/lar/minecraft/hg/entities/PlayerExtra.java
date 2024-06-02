@@ -7,22 +7,30 @@ import lar.minecraft.hg.enums.PlayerClass;
 public class PlayerExtra {
 	
 	private UUID uuid;
+	private String name;
 	private PlayerClass playerClass = null;
 	private boolean lastWinner = false;
 	private boolean premium = false;
+	private int winCount = 0;
 	
-	public PlayerExtra(UUID uuid) {
-		this(uuid, false);
+	public PlayerExtra(UUID uuid, String name) {
+		this(uuid, name, false);
 	}
 	
-	public PlayerExtra(UUID uuid, boolean lastWinner) {
-		this(uuid, lastWinner, false);
+	public PlayerExtra(UUID uuid, String name, boolean lastWinner) {
+		this(uuid, name, lastWinner, false);
 	}
 	
-	public PlayerExtra(UUID uuid, boolean lastWinner, boolean premium) {
+	public PlayerExtra(UUID uuid, String name, boolean lastWinner, boolean premium) {
+		this(uuid, name, lastWinner, false, 0);
+	}
+	
+	public PlayerExtra(UUID uuid, String name, boolean lastWinner, boolean premium, int winCount) {
 		this.uuid = uuid;
+		this.name = name;
 		this.lastWinner = lastWinner;
 		this.premium = premium;
+		this.winCount = winCount;
 	}
 
 	public UUID getUuid() {
@@ -33,6 +41,14 @@ public class PlayerExtra {
 		this.uuid = uuid;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public PlayerClass getPlayerClass() {
 		return playerClass;
 	}
@@ -55,6 +71,14 @@ public class PlayerExtra {
 
 	public void setPremium(boolean premium) {
 		this.premium = premium;
+	}
+
+	public int getWinCount() {
+		return winCount;
+	}
+
+	public void setWinCount(int winCount) {
+		this.winCount = winCount;
 	}
 	
 	@Override
@@ -81,5 +105,4 @@ public class PlayerExtra {
 			return false;
 		return true;
 	}
-
 }
