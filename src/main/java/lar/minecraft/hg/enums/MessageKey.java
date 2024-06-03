@@ -17,5 +17,10 @@ public enum MessageKey {
 	playing_phase_alert,
 	server_to_restart_alert,
 	scoreboard_list_header,
-	wins_the_hunger_games
+	scoreboard_list_header_global,
+	wins_the_hunger_games,
+	scoreboard_list_first_row,
+	scoreboard_list_second_row,
+	scoreboard_list_third_row,
+	scoreboard_list_row;
 }
