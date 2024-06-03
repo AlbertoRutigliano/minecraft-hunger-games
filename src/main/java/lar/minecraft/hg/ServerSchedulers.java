@@ -256,7 +256,9 @@ public class ServerSchedulers {
 			
 		}, 20, 20); // 1 second = 20 ticks
 		
-		supplyDrop(ConfigUtils.getInt(ConfigProperty.chest_spawn_num));
+		if (SpigotPlugin.isPlaying()) {
+			supplyDrop(ConfigUtils.getInt(ConfigProperty.chest_spawn_num));
+		}
 		
 	}
 	
@@ -296,33 +298,38 @@ public class ServerSchedulers {
 			supplyDropTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
 				@Override
 				public void run() {
-					long execTime = world.getTime();
-					
-					// Spawn a supply drop chest after durations.supply-drop seconds
-					if (supplyDropTime == 0) {
-						// If is the first supply drop, get the first-supply-drop duration property 
-						if (index == ConfigUtils.getInt(ConfigProperty.chest_spawn_num)) {
-							supplyDropTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_first_supply_drop));
-						} else {
-							supplyDropTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_supply_drop));
+					if (SpigotPlugin.isPlaying()) {
+						long execTime = world.getTime();
+						
+						// Spawn a supply drop chest after durations.supply-drop seconds
+						if (supplyDropTime == 0) {
+							// If is the first supply drop, get the first-supply-drop duration property 
+							if (index == ConfigUtils.getInt(ConfigProperty.chest_spawn_num)) {
+								supplyDropTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_first_supply_drop));
+							} else {
+								supplyDropTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_supply_drop));
+							}
 						}
-					}
+						
+						long passedSeconds = (execTime - supplyDropTime) / 20;
 					
-					long passedSeconds = (execTime - supplyDropTime) / 20;
-					
-					if (Math.abs(passedSeconds) <= 10) {
-						for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
-							p.spigot().sendMessage(
-									ChatMessageType.ACTION_BAR, 
-									new TextComponent(MessageUtils.getMessage(MessageKey.supply_drop_alert, Math.abs(passedSeconds))));
+						if (Math.abs(passedSeconds) <= 10) {
+							for(Player p : SpigotPlugin.server.getOnlinePlayers()) {
+								p.spigot().sendMessage(
+										ChatMessageType.ACTION_BAR, 
+										new TextComponent(MessageUtils.getMessage(MessageKey.supply_drop_alert, Math.abs(passedSeconds))));
+							}
 						}
-					}
-					
-					if (passedSeconds == 0) {
-						ServerManager.spawnSupplyDrop();
+						
+						if (passedSeconds == 0) {
+							ServerManager.spawnSupplyDrop();
+							server.getScheduler().cancelTask(supplyDropTaskId);
+							supplyDrop(index-1);
+						}
+					} else {
 						server.getScheduler().cancelTask(supplyDropTaskId);
-						supplyDrop(index-1);
 					}
+					
 				}
 				
 			}, 20, 20); // 1 second = 20 ticks
