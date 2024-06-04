@@ -4,6 +4,7 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
@@ -129,7 +130,15 @@ public class ServerSchedulers {
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_phase_alert)));
 			p.setGameMode(GameMode.SURVIVAL);
-			p.teleport(world.getSpawnLocation());
+			
+			// Teleport each player to a random location 
+			Location spawnLocation = ServerManager.getSurfaceRandomLocation(ConfigUtils.getInt(ConfigProperty.world_border_max_size) / 5
+											, SpigotPlugin.newSpawnLocation
+											, 0
+											, 2
+											, 0);
+			
+			p.teleport(spawnLocation);
 			
 			// Write player join on Database
 			DatabaseManager.addPlayerJoin(SpigotPlugin.serverId, currentHGGameId, p);
