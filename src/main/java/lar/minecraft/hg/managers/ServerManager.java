@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -18,6 +19,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import lar.minecraft.hg.ServerSchedulers;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.ConfigProperty;
@@ -49,8 +51,8 @@ public class ServerManager {
 	}
 	
 	public static void spawnSupplyDrop() {
-		// Generate random location for the chest
-        Location chestLocation = getSurfaceRandomLocation(ConfigUtils.getInt(ConfigProperty.world_border_max_size), SpigotPlugin.newSpawnLocation, 0, 1, 0);
+		// Generate random location inside world border for the chest
+        Location chestLocation = getSurfaceRandomLocation(ServerSchedulers.getWorldBorderSize(), SpigotPlugin.newSpawnLocation, 0, 1, 0);
         
         // Create a chest block at the spawn location
         Block block = chestLocation.getBlock();
@@ -91,9 +93,9 @@ public class ServerManager {
 	
 	public static Location getSurfaceRandomLocation(int range, Location startingLocation, int xOffset, int yOffset, int zOffset) {
 		// Generate random offsets for X and Z coordinates
-		Random random = new Random();
-		int offsetX = random.nextInt((range/2)+1) - range/2; // Random value between -range/2 and range/2
-		int offsetZ = random.nextInt((range/2)+1) - range/2; // Random value between -range/2 and range/2
+		Random random = ThreadLocalRandom.current();
+		int offsetX = random.nextInt(range/2) - random.nextInt(range/2); // Random value between -range/2 and range/2
+		int offsetZ = random.nextInt(range/2) - random.nextInt(range/2); // Random value between -range/2 and range/2
 
 		// Apply offsets to the spawn location
 		Location randomLocation = startingLocation.clone().add(offsetX, 0, offsetZ);

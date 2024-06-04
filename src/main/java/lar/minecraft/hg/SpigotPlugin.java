@@ -58,19 +58,20 @@ public class SpigotPlugin extends JavaPlugin {
 		saveDefaultConfig();
 		ConfigUtils.setConfig(config);
 		
-		// Adjust spawn location before starting all phases
+		// Adjust world spawn location before starting all phases
+		// On player join and in game phase players are also teleported in a random location inside world border
 		// Used to prevent playing a game blocked underground or in water biome
 		newSpawnLocation = world.getSpawnLocation().clone();
-		int maxTentativiSpawn = 0;
-		while (world.getHighestBlockAt(newSpawnLocation).isLiquid() && maxTentativiSpawn < 10) {
-			this.getLogger().info("Searching for ground location to set spawnpoint");
-			newSpawnLocation = ServerManager.getSurfaceRandomLocation(ConfigUtils.getInt(ConfigProperty.world_border_max_size)
+		int maxSpawnRetries = 0; // Max retries to find a ground block inside world size
+		while (world.getHighestBlockAt(newSpawnLocation).isLiquid() && maxSpawnRetries < 20) {
+			newSpawnLocation = ServerManager.getSurfaceRandomLocation(Integer.parseInt(serverProps.getProperty("max-world-size"))
 					, world.getSpawnLocation()
 					, 0
 					, 2
 					, 0);
-			maxTentativiSpawn++;
+			maxSpawnRetries++;
 		}
+		this.getLogger().info("World border center set to: " + newSpawnLocation);
 		world.setSpawnLocation(newSpawnLocation);
 
     	// Create world border

@@ -43,6 +43,10 @@ public class ServerSchedulers {
 		ServerSchedulers.world = SpigotPlugin.world;
 	}
 	
+	public static int getWorldBorderSize() {
+		return worldBorderSize;
+	}
+	
 	private static long gameStartTime = 0;
 	private static long safeAreaTime = 0;
 	private static long winnerCelebrationsTime = 0;
@@ -132,7 +136,7 @@ public class ServerSchedulers {
 			p.setGameMode(GameMode.SURVIVAL);
 			
 			// Teleport each player to a random location 
-			Location spawnLocation = ServerManager.getSurfaceRandomLocation(ConfigUtils.getInt(ConfigProperty.world_border_max_size) / 5
+			Location spawnLocation = ServerManager.getSurfaceRandomLocation(ConfigUtils.getInt(ConfigProperty.world_border_max_size)
 											, SpigotPlugin.newSpawnLocation
 											, 0
 											, 2
