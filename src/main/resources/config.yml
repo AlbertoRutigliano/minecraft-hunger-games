@@ -1,8 +1,10 @@
 # Minimum players to start the Hunger Games
-min-players: 3
+min-players: 2
+# Number of supply drop chest to spawn
+chest-spawn-num: 3
 durations:
   # Lobby phase duration in seconds where players can login and choose their class
-  lobby: 10
+  lobby: 30
   # Safe area duration in seconds where players can destroy blocks and collect items but cannot hit other players
   safe-area: 30
   # Winner celebrations duration in seconds
@@ -10,14 +12,22 @@ durations:
   # Fireworks celebrations duration in seconds
   fireworks: 15 
   # How many seconds after the start of the game (after safe-area phase) is the supply chest dropped
+  first-supply-drop: 30
+  # Interval seconds between every supply chest drop
   supply-drop: 60
-  # How many seconds a player can be stationary during the playing phase before getting kicked (minutes)
+  # How many minutes a player can be stationary during the playing phase before getting kicked
   idle-timeout: 2
 world-border:
   # Max world size dimension in blocks
   max-size: 128
   # Min world size dimension in blocks
   min-size: 2
+  # Enable the world collapse feature
+  collapse: true
+  # How many seconds to reduce world border by collapse-radius value
+  collapse-counter-seconds: 60
+  # World border collapse radius
+  collapse-radius: 20
 server:
   id: 1
   # When server is started, automatically start a new Hunger Games session
@@ -30,5 +40,5 @@ database:
   # Connection string for the database
   connection-string: jdbc:mysql://51.38.125.46:3306/hunger_games
   # Database Connection user credentials
-  db-user: test
-  db-password: test
+  user: test
+  password: test

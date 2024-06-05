@@ -1,9 +1,14 @@
 package lar.minecraft.hg.enums;
 
 public enum HGPhase {
-	WAITING_FOR_HG,
+	WAITING,
 	LOBBY,
 	SAFE_AREA,
 	PLAYING,
-	WINNING
+	WINNING;
+	
+	@Override
+	public String toString() {
+		return this.name().toLowerCase();
+	}
 }

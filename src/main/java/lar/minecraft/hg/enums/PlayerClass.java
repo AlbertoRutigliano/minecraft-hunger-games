@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public enum PlayerClass {
-	MINER (Sound.ENTITY_ITEM_BREAK) {
+	miner (Sound.ENTITY_ITEM_BREAK, false) {
 		@Override
 		public PlayerAction getAction() {
 			return (player) -> {
@@ -16,7 +16,7 @@ public enum PlayerClass {
             };
 		}
 	},
-    BOWMAN (Sound.ITEM_CROSSBOW_HIT) {
+    bowman (Sound.ITEM_CROSSBOW_HIT, false) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -24,7 +24,7 @@ public enum PlayerClass {
             };
         }
     },
-    ARMORED (Sound.ITEM_ARMOR_EQUIP_LEATHER) {
+    armored (Sound.ITEM_ARMOR_EQUIP_LEATHER, true) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -36,7 +36,7 @@ public enum PlayerClass {
             };
         }
     },
-    DOGLOVER (Sound.ENTITY_WOLF_PANT) {
+    doglover (Sound.ENTITY_WOLF_PANT, false) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -49,7 +49,7 @@ public enum PlayerClass {
             };
         }
     },
-    LAVAMAN (Sound.ITEM_BUCKET_FILL_LAVA) {
+    lavaman (Sound.ITEM_BUCKET_FILL_LAVA, false) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -60,9 +60,11 @@ public enum PlayerClass {
     };
 
     private Sound sound = Sound.INTENTIONALLY_EMPTY;
+    private boolean premium = false;
 
-    PlayerClass(Sound sound) {
+    PlayerClass(Sound sound, boolean premium) {
         this.sound = sound;
+        this.premium = premium;
     }
     
     PlayerClass() {}
@@ -70,6 +72,18 @@ public enum PlayerClass {
     public Sound getSound() {
         return sound;
     }
+    
+    public void setSound(Sound sound) {
+        this.sound = sound;
+    }
+    
+	public boolean isPremium() {
+		return premium;
+	}
+
+	public void setPremium(boolean premium) {
+		this.premium = premium;
+	}
 
     // Define a functional interface for player actions
     public interface PlayerAction {
@@ -78,4 +92,5 @@ public enum PlayerClass {
 
     // Abstract method to get the action for each class
     abstract public PlayerAction getAction();
+
 }

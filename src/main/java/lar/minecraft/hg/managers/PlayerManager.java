@@ -1,8 +1,18 @@
 package lar.minecraft.hg.managers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,34 +25,86 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import lar.minecraft.hg.SpigotPlugin;
+import lar.minecraft.hg.entities.PlayerExtra;
+import lar.minecraft.hg.enums.MessageKey;
+import lar.minecraft.hg.utils.MessageUtils;
 
 public class PlayerManager implements Listener {
 
+	public static Map<UUID, PlayerExtra> playerExtras = new HashMap<>();
+	
+	private int winnerParticleEffectTaskId = 0;
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
+			// Teleport each player to a random location 
+			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
+			player.teleport(spawnLocation);
+
+			player.setGameMode(GameMode.ADVENTURE);
+			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
+			
+			// Check if the player is the winner of the last match or he is premium and create PlayerExtra to track it
+			String lastWinner = DatabaseManager.getLastWinner(SpigotPlugin.serverId);
+			boolean isLastWinner = false;
+			
+			if (!lastWinner.isEmpty()) {
+				isLastWinner = player.getUniqueId().compareTo(UUID.fromString(lastWinner)) == 0 ? true : false;
+				if (isLastWinner) {
+					player.sendMessage(MessageUtils.getMessage(MessageKey.last_match_win));
+					
+					// Run a task to spawn particles effects to signal that he is the winner!
+					winnerParticleEffectTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+						@Override
+						public void run() {
+							if (PlayerManager.playerExtras.get(player.getUniqueId()).isLastWinner()) {
+								SpigotPlugin.server.getWorld(player.getWorld().getName()).spawnParticle(Particle.DRAGON_BREATH, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 40, -0.5, 0.5, -0.5, 0.01);
+							}
+						}
+					}, 20, 10); // 1 second = 20 ticks
+				}
+			}
+			boolean isPremium = DatabaseManager.isPlayerPremium(player.getUniqueId().toString());
+			int winCount = DatabaseManager.getPlayerWinCount(player.getUniqueId().toString());
+			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), player.getName(), isLastWinner, isPremium, winCount);
+			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
+			
+			createPlayerLocationBossBar(player);
+		}
+		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
+			event.setJoinMessage(null);
+			player.setGameMode(GameMode.SPECTATOR);
+		}
+	}
+	
+	/**
+	 * Player damage event
+	 */
+	@EventHandler
+	public void onPlayerDamage(EntityDamageEvent event) {
+		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart()) {
+			event.setCancelled(true);
+		}
+	}
+	
 	/**
 	 * Player death event
 	 */
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event){
-		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-		Player killedPlayer = event.getEntity().getPlayer();
-		killedPlayer.setGameMode(GameMode.SPECTATOR);
+		Player deathPlayer = event.getEntity().getPlayer();
+		deathPlayer.getWorld().strikeLightningEffect(deathPlayer.getLocation());
+		deathPlayer.setGameMode(GameMode.SPECTATOR);
+
+		// Stop reproducing particles of the winner player
+		if (PlayerManager.playerExtras.get(deathPlayer.getUniqueId()).isLastWinner()) {
+			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+		}
 		
-		// Check if the killer is a player
-        if (event.getEntity().getKiller() != null) {
-            // Get the player who was killed and the killer
-            Player killer = killedPlayer.getKiller();
-            
-            // Create the player head item
-            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
-            if (skullMeta != null) {
-                skullMeta.setOwningPlayer(killedPlayer);
-                playerHead.setItemMeta(skullMeta);
-            }
-            
-            // Give the killer the head of the killed player
-            killer.getInventory().addItem(playerHead);
-        }
+		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+		retrieveKilledPlayerHead(event);
 	}
 	
 	/**
@@ -50,27 +112,18 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
+		if (SpigotPlugin.isWinning() || SpigotPlugin.isLobby()) { 
+			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
+		}
 		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
+			Player player = event.getPlayer();
+			player.getWorld().strikeLightningEffect(player.getLocation());
 			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		}
-	}
-	
-	@EventHandler
-	public void onPlayerDamage(EntityDamageEvent event) {
-		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart()) {
-			event.setCancelled(true);
-		}
-	}
-		
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
-			event.getPlayer().setGameMode(GameMode.ADVENTURE);
-			event.getPlayer().playSound(event.getPlayer(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
-		}
-		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
-			event.setJoinMessage(null);
-			event.getPlayer().setGameMode(GameMode.SPECTATOR);
+		// Stop reproducing particles of the winner player
+		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
+		if (playerExtra != null && playerExtra.isLastWinner()) {
+			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
 	}
 	
@@ -91,4 +144,44 @@ public class PlayerManager implements Listener {
         return target;
     }
 	
+	/*
+	 * If a Player kill another Player he receive the killedPlayer head as prize
+	 */
+	private void retrieveKilledPlayerHead(PlayerDeathEvent event) {
+		Player killedPlayer = event.getEntity().getPlayer();
+		// Check if the killer is a player
+        if (event.getEntity().getKiller() != null) {
+            // Get the player who was killed and the killer
+            Player killer = killedPlayer.getKiller();
+            
+            // Create the player head item
+            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
+            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+            if (skullMeta != null) {
+                skullMeta.setOwningPlayer(killedPlayer);
+                playerHead.setItemMeta(skullMeta);
+            }
+            // Give the killer the head of the killed player
+            killer.getInventory().addItem(playerHead);
+        }
+	}
+	
+    
+    private void createPlayerLocationBossBar(Player player) {
+        BossBar bossBar = Bukkit.createBossBar(player.getDisplayName() + " location", BarColor.WHITE, BarStyle.SOLID);
+        bossBar.addPlayer(player);
+        bossBar.setProgress(1.0);
+        SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class), new Runnable() {
+			@Override
+			public void run() {
+				if (bossBar != null) {
+		            Location loc = player.getLocation();
+		            bossBar.setTitle(MessageUtils.getMessage(MessageKey.current_player_location, 
+		            		String.format("%.2f", loc.getX()), 
+		            		String.format("%.2f", loc.getY()), 
+		            		String.format("%.2f", loc.getZ())));
+		        }
+			}
+		}, 0, 5); // 1 second = 20 ticks
+    }
 }
