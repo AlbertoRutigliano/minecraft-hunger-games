@@ -22,6 +22,8 @@ world-border:
   max-size: 128
   # Min world size dimension in blocks
   min-size: 2
+  # Enable the world collapse feature
+  collapse: true
   # How many seconds to reduce world border by collapse-radius value
   collapse-counter-seconds: 60
   # World border collapse radius

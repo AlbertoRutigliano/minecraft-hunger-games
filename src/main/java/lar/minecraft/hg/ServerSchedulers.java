@@ -177,20 +177,23 @@ public class ServerSchedulers {
 				long execTime = world.getTime();
 				
 				// WORLD BORDER COLLAPSE
-				// First runnable run
-				if(worldBorderCollapseTime == 0) {
-					worldBorderCollapseTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
-				}
-				long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
-				if(passedSecondsForWorldBorderCollapse == 0) {
-					if (worldBorderSize > ConfigUtils.getInt(ConfigProperty.world_border_min_size)) {
-						worldBorderSize = worldBorderSize - ConfigUtils.getInt(ConfigProperty.world_border_collapse_radius);
-						world.getWorldBorder().setSize(worldBorderSize, ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
-						world.getWorldBorder().setDamageBuffer(0);
-						world.getWorldBorder().setDamageAmount(0.2);
-						worldBorderCollapseTime = 0; 
+				if (ConfigUtils.getBoolean(ConfigProperty.world_border_collapse)) {
+					// First runnable run
+					if(worldBorderCollapseTime == 0) {
+						worldBorderCollapseTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
+					}
+					long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
+					if(passedSecondsForWorldBorderCollapse == 0) {
+						if (worldBorderSize > ConfigUtils.getInt(ConfigProperty.world_border_min_size)) {
+							worldBorderSize = worldBorderSize - ConfigUtils.getInt(ConfigProperty.world_border_collapse_radius);
+							world.getWorldBorder().setSize(worldBorderSize, ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
+							world.getWorldBorder().setDamageBuffer(0);
+							world.getWorldBorder().setDamageAmount(0.2);
+							worldBorderCollapseTime = 0; 
+						}
 					}
 				}
+				
 				
 				// COMPASS TRACKING
 				for (Player player : ServerManager.getLivingPlayers()) {
