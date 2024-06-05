@@ -2,8 +2,6 @@ package lar.minecraft.hg.entities;
 
 import java.util.UUID;
 
-import org.bukkit.boss.BossBar;
-
 import lar.minecraft.hg.enums.PlayerClass;
 
 public class PlayerExtra {
@@ -14,7 +12,6 @@ public class PlayerExtra {
 	private boolean lastWinner = false;
 	private boolean premium = false;
 	private int winCount = 0;
-	private BossBar bossBar;
 	
 	public PlayerExtra(UUID uuid, String name) {
 		this(uuid, name, false);
@@ -82,14 +79,6 @@ public class PlayerExtra {
 
 	public void setWinCount(int winCount) {
 		this.winCount = winCount;
-	}
-	
-	public BossBar getBossBar() {
-		return bossBar;
-	}
-
-	public void setBossBar(BossBar bossBar) {
-		this.bossBar = bossBar;
 	}
 
 	@Override

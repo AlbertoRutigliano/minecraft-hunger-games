@@ -26,9 +26,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
-import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.MessageKey;
-import lar.minecraft.hg.utils.ConfigUtils;
 import lar.minecraft.hg.utils.MessageUtils;
 
 public class PlayerManager implements Listener {
@@ -68,8 +66,9 @@ public class PlayerManager implements Listener {
 			boolean isPremium = DatabaseManager.isPlayerPremium(player.getUniqueId().toString());
 			int winCount = DatabaseManager.getPlayerWinCount(player.getUniqueId().toString());
 			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), player.getName(), isLastWinner, isPremium, winCount);
-			playerExtra.setBossBar(createBossBar(player));
 			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
+			
+			createPlayerLocationBossBar(player);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
 			event.setJoinMessage(null);
@@ -101,9 +100,6 @@ public class PlayerManager implements Listener {
 			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
 		
-		// Remove player BossBar location coordinations
-		PlayerManager.playerExtras.get(event.getEntity().getPlayer().getUniqueId()).setBossBar(null);
-
 		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		retrieveKilledPlayerHead(event);
 	}
@@ -168,10 +164,11 @@ public class PlayerManager implements Listener {
 	}
 	
     
-    private BossBar createBossBar(Player player) {
+    private void createPlayerLocationBossBar(Player player) {
         BossBar bossBar = Bukkit.createBossBar(player.getDisplayName() + " location", BarColor.WHITE, BarStyle.SOLID);
         bossBar.addPlayer(player);
-        SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+        bossBar.setProgress(1.0);
+        SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class), new Runnable() {
 			@Override
 			public void run() {
 				if (bossBar != null) {
@@ -180,11 +177,8 @@ public class PlayerManager implements Listener {
 		            		String.format("%.2f", loc.getX()), 
 		            		String.format("%.2f", loc.getY()), 
 		            		String.format("%.2f", loc.getZ())));
-		            double playersPercentage = (double) ServerManager.getLivingPlayers().size() / (double) ConfigUtils.getInt(ConfigProperty.min_players);
-		            bossBar.setProgress(playersPercentage);
 		        }
 			}
 		}, 0, 5); // 1 second = 20 ticks
-        return bossBar;
     }
 }
