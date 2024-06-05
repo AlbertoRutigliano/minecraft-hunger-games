@@ -191,15 +191,15 @@ public class ServerSchedulers {
 				long execTime = world.getTime();
 				
 				// WORLD BORDER COLLAPSE
-				if (ConfigUtils.getBoolean(ConfigProperty.world_border_collapse)) {
+				if (ConfigUtils.getBoolean(ConfigProperty.world_border_collapse) && SpigotPlugin.isPlaying()) {
 					// First runnable run
 					if(worldBorderCollapseTime == 0) {
 						worldBorderCollapseTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
-						Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.world_border_collapse_message));
 					}
 					long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
 					if(passedSecondsForWorldBorderCollapse == 0) {
 						if (worldBorderSize > ConfigUtils.getInt(ConfigProperty.world_border_min_size)) {
+							Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.world_border_collapse_message));
 							worldBorderSize = worldBorderSize - ConfigUtils.getInt(ConfigProperty.world_border_collapse_radius);
 							world.getWorldBorder().setSize(worldBorderSize, ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
 							world.getWorldBorder().setDamageBuffer(0);

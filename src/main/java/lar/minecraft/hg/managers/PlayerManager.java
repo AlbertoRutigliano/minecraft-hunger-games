@@ -22,9 +22,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
-import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.MessageKey;
-import lar.minecraft.hg.utils.ConfigUtils;
 import lar.minecraft.hg.utils.MessageUtils;
 
 public class PlayerManager implements Listener {
