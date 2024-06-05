@@ -17,11 +17,11 @@ public class PlayerClassManager {
 			PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(player.getUniqueId(), null);
 			if (playerExtra != null) {
 				PlayerClass playerClass = playerExtra.getPlayerClass();
-				if (playerClass != null) {
-					playerClass.getAction().perform(player); // Give class items to players who chosen a class
-				}
 				if(playerClass == null || playerClass != PlayerClass.hardcore) {
 					playerInventory.addItem(new ItemStack(Material.COMPASS)); // Give a compass to all players
+				}
+				if (playerClass != null) {
+					playerClass.getAction().perform(player); // Give class items to players who chosen a class
 				}
 			}
 			player.updateInventory();
