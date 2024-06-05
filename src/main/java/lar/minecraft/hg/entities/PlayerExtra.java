@@ -80,7 +80,7 @@ public class PlayerExtra {
 	public void setWinCount(int winCount) {
 		this.winCount = winCount;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
