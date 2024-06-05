@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import lar.minecraft.hg.commands.ClassCommand;
 import lar.minecraft.hg.commands.ScoreboardCommand;
 import lar.minecraft.hg.commands.TestCommand;
+import lar.minecraft.hg.enums.Cmd;
 import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.enums.PlayerClass;
@@ -73,15 +74,15 @@ public class SpigotPlugin extends JavaPlugin {
     	DatabaseManager.init(databaseEnabled, dbConnectionString, dbUser, dbPassword);
     	
         // Enable test commands
-        getCommand("start-hg").setExecutor(new TestCommand(this));
-        getCommand("current-phase").setExecutor(new TestCommand(this));
-        getCommand("restart-hg-server").setExecutor(new TestCommand(this));
-        getCommand("test").setExecutor(new TestCommand(this));
-        getCommand("messages").setExecutor(new TestCommand(this));
+        getCommand(Cmd.start_hg).setExecutor(new TestCommand(this));
+        getCommand(Cmd.current_phase).setExecutor(new TestCommand(this));
+        getCommand(Cmd.restart_hg_server).setExecutor(new TestCommand(this));
+        getCommand(Cmd.test).setExecutor(new TestCommand(this));
+        getCommand(Cmd.messages).setExecutor(new TestCommand(this));
         
         // Enable game commands
-        getCommand("scoreboard").setExecutor(new ScoreboardCommand());
-		getCommand("scoreboard").setTabCompleter(new ScoreboardCommand());
+        getCommand(Cmd.scoreboard).setExecutor(new ScoreboardCommand());
+		getCommand(Cmd.scoreboard).setTabCompleter(new ScoreboardCommand());
         
         // Enable class selection commands
         Arrays.asList(PlayerClass.values()).forEach(c -> {
