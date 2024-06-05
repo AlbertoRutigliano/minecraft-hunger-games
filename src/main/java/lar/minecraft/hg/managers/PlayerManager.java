@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,9 +41,8 @@ public class PlayerManager implements Listener {
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
 			// Teleport each player to a random location 
 			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
-			
 			player.teleport(spawnLocation);
-			
+
 			player.setGameMode(GameMode.ADVENTURE);
 			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
 			
@@ -67,6 +70,8 @@ public class PlayerManager implements Listener {
 			int winCount = DatabaseManager.getPlayerWinCount(player.getUniqueId().toString());
 			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), player.getName(), isLastWinner, isPremium, winCount);
 			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
+			
+			createPlayerLocationBossBar(player);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
 			event.setJoinMessage(null);
@@ -97,7 +102,7 @@ public class PlayerManager implements Listener {
 		if (PlayerManager.playerExtras.get(deathPlayer.getUniqueId()).isLastWinner()) {
 			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
-
+		
 		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		retrieveKilledPlayerHead(event);
 	}
@@ -160,4 +165,23 @@ public class PlayerManager implements Listener {
             killer.getInventory().addItem(playerHead);
         }
 	}
+	
+    
+    private void createPlayerLocationBossBar(Player player) {
+        BossBar bossBar = Bukkit.createBossBar(player.getDisplayName() + " location", BarColor.WHITE, BarStyle.SOLID);
+        bossBar.addPlayer(player);
+        bossBar.setProgress(1.0);
+        SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class), new Runnable() {
+			@Override
+			public void run() {
+				if (bossBar != null) {
+		            Location loc = player.getLocation();
+		            bossBar.setTitle(MessageUtils.getMessage(MessageKey.current_player_location, 
+		            		String.format("%.2f", loc.getX()), 
+		            		String.format("%.2f", loc.getY()), 
+		            		String.format("%.2f", loc.getZ())));
+		        }
+			}
+		}, 0, 5); // 1 second = 20 ticks
+    }
 }
