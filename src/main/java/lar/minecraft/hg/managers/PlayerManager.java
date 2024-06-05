@@ -100,6 +100,9 @@ public class PlayerManager implements Listener {
 		if (PlayerManager.playerExtras.get(deathPlayer.getUniqueId()).isLastWinner()) {
 			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
+		
+		// Remove player BossBar location coordinations
+		PlayerManager.playerExtras.get(event.getEntity().getPlayer().getUniqueId()).setBossBar(null);
 
 		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		retrieveKilledPlayerHead(event);

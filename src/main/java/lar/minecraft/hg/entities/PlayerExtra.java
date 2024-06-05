@@ -84,7 +84,6 @@ public class PlayerExtra {
 		this.winCount = winCount;
 	}
 	
-	
 	public BossBar getBossBar() {
 		return bossBar;
 	}
