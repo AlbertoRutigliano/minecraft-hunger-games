@@ -1,5 +1,6 @@
 package lar.minecraft.hg;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
@@ -181,6 +182,7 @@ public class ServerSchedulers {
 					// First runnable run
 					if(worldBorderCollapseTime == 0) {
 						worldBorderCollapseTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
+						Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.world_border_collapse_message));
 					}
 					long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
 					if(passedSecondsForWorldBorderCollapse == 0) {
