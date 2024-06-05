@@ -54,6 +54,26 @@ commands:
         description: Dig in, my friend!
         permission: perm.general
         usage: /<command>
+    mole:
+        description: Dig out, my friend!
+        permission: perm.general
+        usage: /<command>
+    ghost:
+        description: Let's get invisible
+        permission: perm.general
+        usage: /<command>
+    teleporter:
+        description: I'm here... not anymore
+        permission: perm.general
+        usage: /<command>
+    barbarian:
+        description: WWOOWOWOW
+        permission: perm.general
+        usage: /<command>
+    hardcore:
+        description: Are you crazy!?!?
+        permission: perm.general
+        usage: /<command>
 permissions:
    perm.general:
       default: true

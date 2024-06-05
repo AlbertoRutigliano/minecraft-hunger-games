@@ -6,13 +6,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public enum PlayerClass {
 	miner (Sound.ENTITY_ITEM_BREAK, false) {
 		@Override
 		public PlayerAction getAction() {
 			return (player) -> {
-            	player.getInventory().addItem(new ItemStack(Material.IRON_PICKAXE), new ItemStack(Material.TORCH, 8));
+            	player.getInventory().addItem(new ItemStack(Material.STONE_PICKAXE), new ItemStack(Material.TORCH, 8));
             };
 		}
 	},
@@ -49,12 +52,58 @@ public enum PlayerClass {
             };
         }
     },
-    lavaman (Sound.ITEM_BUCKET_FILL_LAVA, false) {
+    lavaman (Sound.ITEM_BUCKET_FILL_LAVA, true) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
                 player.getInventory().addItem(
-                		new ItemStack(Material.LAVA_BUCKET), new ItemStack(Material.LAVA_BUCKET), new ItemStack(Material.LAVA_BUCKET));
+                		new ItemStack(Material.LAVA_BUCKET), new ItemStack(Material.LAVA_BUCKET));
+            };
+        }
+    },
+    mole (Sound.BLOCK_ROOTED_DIRT_PLACE, false) {
+        @Override
+        public PlayerAction getAction() {
+            return (player) -> {
+                player.getInventory().addItem(new ItemStack(Material.DIRT, 32));
+            };
+        }
+    },
+    ghost (Sound.ENTITY_WANDERING_TRADER_DRINK_POTION, true) {
+        @Override
+        public PlayerAction getAction() {
+            return (player) -> {
+                ItemStack potion = new ItemStack(Material.POTION, 2);
+                PotionMeta meta = (PotionMeta) potion.getItemMeta();
+                meta.addCustomEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 600, 1), true); // 600 ticks = 30 seconds
+                meta.setDisplayName("Potion of Invisibility");
+                potion.setItemMeta(meta);
+                player.getInventory().addItem(potion);
+            };
+        }
+    },
+    teleporter (Sound.ENTITY_ENDERMAN_TELEPORT, false) {
+        @Override
+        public PlayerAction getAction() {
+            return (player) -> {
+                player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 3));
+            };
+        }
+    },
+    barbarian (Sound.ENTITY_PLAYER_ATTACK_SWEEP, false) {
+        @Override
+        public PlayerAction getAction() {
+            return (player) -> {
+                player.getInventory().addItem(new ItemStack(Material.STONE_SWORD));
+            };
+        }
+    },
+    hardcore (Sound.ENTITY_PLAYER_BURP, false) {
+        @Override
+        public PlayerAction getAction() {
+            return (player) -> {
+            	PlayerInventory playerInventory = player.getInventory();
+                playerInventory.setHelmet(new ItemStack(Material.CARVED_PUMPKIN));
             };
         }
     };

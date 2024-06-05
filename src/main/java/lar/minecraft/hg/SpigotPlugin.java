@@ -65,6 +65,7 @@ public class SpigotPlugin extends JavaPlugin {
 		newSpawnLocation = world.getSpawnLocation().clone();
 		int maxSpawnRetries = 0; // Max retries to find a ground block inside world size
 		while (world.getHighestBlockAt(newSpawnLocation).isLiquid() && maxSpawnRetries < 20) {
+			this.getLogger().info("(attempt " + maxSpawnRetries + ") Water found in: " + newSpawnLocation);
 			newSpawnLocation = ServerManager.getSurfaceRandomLocation(Integer.parseInt(serverProps.getProperty("max-world-size"))
 					, world.getSpawnLocation()
 					, 0
@@ -73,9 +74,11 @@ public class SpigotPlugin extends JavaPlugin {
 			maxSpawnRetries++;
 		}
 		if (maxSpawnRetries == 20) {
+			this.getLogger().info("Cannot find ground in world");
 			ServerManager.restartServer();
+		}else {
+			this.getLogger().info("World border center set to: " + newSpawnLocation);
 		}
-		this.getLogger().info("World border center set to: " + newSpawnLocation);
 		world.setSpawnLocation(newSpawnLocation);
 
     	// Create world border
