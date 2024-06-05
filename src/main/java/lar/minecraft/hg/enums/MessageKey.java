@@ -22,5 +22,6 @@ public enum MessageKey {
 	scoreboard_list_first_row,
 	scoreboard_list_second_row,
 	scoreboard_list_third_row,
-	scoreboard_list_row;
+	scoreboard_list_row,
+	current_player_location;
 }

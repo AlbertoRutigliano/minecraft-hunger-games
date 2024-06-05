@@ -4,10 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +26,9 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
+import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.MessageKey;
+import lar.minecraft.hg.utils.ConfigUtils;
 import lar.minecraft.hg.utils.MessageUtils;
 
 public class PlayerManager implements Listener {
@@ -34,7 +41,7 @@ public class PlayerManager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
 			Player player = event.getPlayer();
-			
+
 			player.setGameMode(GameMode.ADVENTURE);
 			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
 			
@@ -61,6 +68,7 @@ public class PlayerManager implements Listener {
 			boolean isPremium = DatabaseManager.isPlayerPremium(player.getUniqueId().toString());
 			int winCount = DatabaseManager.getPlayerWinCount(player.getUniqueId().toString());
 			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), player.getName(), isLastWinner, isPremium, winCount);
+			playerExtra.setBossBar(createBossBar(player));
 			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
@@ -155,4 +163,25 @@ public class PlayerManager implements Listener {
             killer.getInventory().addItem(playerHead);
         }
 	}
+	
+    
+    private BossBar createBossBar(Player player) {
+        BossBar bossBar = Bukkit.createBossBar(player.getDisplayName() + " location", BarColor.WHITE, BarStyle.SOLID);
+        bossBar.addPlayer(player);
+        SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
+			@Override
+			public void run() {
+				if (bossBar != null) {
+		            Location loc = player.getLocation();
+		            bossBar.setTitle(MessageUtils.getMessage(MessageKey.current_player_location, 
+		            		String.format("%.2f", loc.getX()), 
+		            		String.format("%.2f", loc.getY()), 
+		            		String.format("%.2f", loc.getZ())));
+		            double playersPercentage = (double) ServerManager.getLivingPlayers().size() / (double) ConfigUtils.getInt(ConfigProperty.min_players);
+		            bossBar.setProgress(playersPercentage);
+		        }
+			}
+		}, 0, 5); // 1 second = 20 ticks
+        return bossBar;
+    }
 }
