@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import org.bukkit.Difficulty;
+import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,6 +23,7 @@ import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerManager;
+import lar.minecraft.hg.managers.ServerManager;
 import lar.minecraft.hg.utils.ConfigUtils;
 import lar.minecraft.hg.utils.MessageUtils;
 
@@ -39,6 +41,8 @@ public class SpigotPlugin extends JavaPlugin {
 	
 	public static World world;
 	
+	public static Location newSpawnLocation;
+	
     @Override
     public void onEnable() {
 		server = getServer();
@@ -55,13 +59,32 @@ public class SpigotPlugin extends JavaPlugin {
 		saveDefaultConfig();
 		ConfigUtils.setConfig(config);
 		
+		// Adjust world spawn location before starting all phases
+		// On player join and in game phase players are also teleported in a random location inside world border
+		// Used to prevent playing a game blocked underground or in water biome
+		newSpawnLocation = world.getSpawnLocation().clone();
+		int maxSpawnRetries = 0; // Max retries to find a ground block inside world size
+		while (world.getHighestBlockAt(newSpawnLocation).isLiquid() && maxSpawnRetries < 20) {
+			newSpawnLocation = ServerManager.getSurfaceRandomLocation(Integer.parseInt(serverProps.getProperty("max-world-size"))
+					, world.getSpawnLocation()
+					, 0
+					, 2
+					, 0);
+			maxSpawnRetries++;
+		}
+		if (maxSpawnRetries == 20) {
+			ServerManager.restartServer();
+		}
+		this.getLogger().info("World border center set to: " + newSpawnLocation);
+		world.setSpawnLocation(newSpawnLocation);
+
+    	// Create world border
+    	world.getWorldBorder().setCenter(newSpawnLocation);
+    	world.getWorldBorder().setSize(ConfigUtils.getInt(ConfigProperty.world_border_max_size));
+		
 		ServerSchedulers.init(this);
     	serverId = ConfigUtils.getInt(ConfigProperty.server_id);
     	world.setDifficulty(Difficulty.NORMAL);
-    	
-    	// Create world border
-    	world.getWorldBorder().setCenter(world.getSpawnLocation());
-    	world.getWorldBorder().setSize(ConfigUtils.getInt(ConfigProperty.world_border_max_size));
     	
     	// Initialize MessageUtils for messages
     	MessageUtils.init();
