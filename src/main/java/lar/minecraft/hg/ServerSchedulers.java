@@ -136,7 +136,7 @@ public class ServerSchedulers {
 			p.setGameMode(GameMode.SURVIVAL);
 			
 			// Teleport each player to a random location 
-			Location spawnLocation = ServerManager.getSurfaceRandomLocation(ConfigUtils.getInt(ConfigProperty.world_border_max_size)
+			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30
 											, SpigotPlugin.newSpawnLocation
 											, 0
 											, 2

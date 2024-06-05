@@ -38,11 +38,7 @@ public class PlayerManager implements Listener {
 		Player player = event.getPlayer();
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
 			// Teleport each player to a random location 
-			Location spawnLocation = ServerManager.getSurfaceRandomLocation(ConfigUtils.getInt(ConfigProperty.world_border_max_size)
-											, SpigotPlugin.newSpawnLocation
-											, 0
-											, 2
-											, 0);
+			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
 			
 			player.teleport(spawnLocation);
 			

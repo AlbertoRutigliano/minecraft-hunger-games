@@ -71,6 +71,9 @@ public class SpigotPlugin extends JavaPlugin {
 					, 0);
 			maxSpawnRetries++;
 		}
+		if (maxSpawnRetries == 20) {
+			ServerManager.restartServer();
+		}
 		this.getLogger().info("World border center set to: " + newSpawnLocation);
 		world.setSpawnLocation(newSpawnLocation);
 

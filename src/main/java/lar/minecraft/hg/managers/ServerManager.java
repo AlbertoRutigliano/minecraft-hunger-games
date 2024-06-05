@@ -74,13 +74,6 @@ public class ServerManager {
             items.add(new ItemStackProbability(Material.WATER_BUCKET, 0.15));
             items.add(new ItemStackProbability(Material.DIAMOND_SWORD, 0.05));
             items.add(new ItemStackProbability(Material.ENDER_PEARL, 0.25, 4, 12));
-
-            // TODO: remove this code?
-            /* This code should add empty spaces in the chest but seems not working
-            int itemsToAdd = items.size();
-            for (int i = itemsToAdd; i < 27; i++) { // 27 is the max inventory size
-            	items.add(new ItemStackProbability(Material.AIR, 1.0)); // Add an empty slot
-            }*/
             
             Collections.shuffle(items);
             items.forEach(i-> chestInventory.addItem(i));
