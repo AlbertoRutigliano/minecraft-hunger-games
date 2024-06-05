@@ -1,9 +1,11 @@
 package lar.minecraft.hg;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
@@ -40,6 +42,10 @@ public class ServerSchedulers {
 		ServerSchedulers.plugin = plugin;
 		ServerSchedulers.server = plugin.getServer();
 		ServerSchedulers.world = SpigotPlugin.world;
+	}
+	
+	public static int getWorldBorderSize() {
+		return worldBorderSize;
 	}
 	
 	private static long gameStartTime = 0;
@@ -129,7 +135,15 @@ public class ServerSchedulers {
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_phase_alert)));
 			p.setGameMode(GameMode.SURVIVAL);
-			p.teleport(world.getSpawnLocation());
+			
+			// Teleport each player to a random location 
+			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30
+											, SpigotPlugin.newSpawnLocation
+											, 0
+											, 2
+											, 0);
+			
+			p.teleport(spawnLocation);
 			
 			// Write player join on Database
 			DatabaseManager.addPlayerJoin(SpigotPlugin.serverId, currentHGGameId, p);
@@ -177,20 +191,24 @@ public class ServerSchedulers {
 				long execTime = world.getTime();
 				
 				// WORLD BORDER COLLAPSE
-				// First runnable run
-				if(worldBorderCollapseTime == 0) {
-					worldBorderCollapseTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
-				}
-				long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
-				if(passedSecondsForWorldBorderCollapse == 0) {
-					if (worldBorderSize > ConfigUtils.getInt(ConfigProperty.world_border_min_size)) {
-						worldBorderSize = worldBorderSize - ConfigUtils.getInt(ConfigProperty.world_border_collapse_radius);
-						world.getWorldBorder().setSize(worldBorderSize, ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
-						world.getWorldBorder().setDamageBuffer(0);
-						world.getWorldBorder().setDamageAmount(0.2);
-						worldBorderCollapseTime = 0; 
+				if (ConfigUtils.getBoolean(ConfigProperty.world_border_collapse)) {
+					// First runnable run
+					if(worldBorderCollapseTime == 0) {
+						worldBorderCollapseTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
+						Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.world_border_collapse_message));
+					}
+					long passedSecondsForWorldBorderCollapse = (execTime - worldBorderCollapseTime) / 20;
+					if(passedSecondsForWorldBorderCollapse == 0) {
+						if (worldBorderSize > ConfigUtils.getInt(ConfigProperty.world_border_min_size)) {
+							worldBorderSize = worldBorderSize - ConfigUtils.getInt(ConfigProperty.world_border_collapse_radius);
+							world.getWorldBorder().setSize(worldBorderSize, ConfigUtils.getInt(ConfigProperty.world_border_collapse_counter_seconds));
+							world.getWorldBorder().setDamageBuffer(0);
+							world.getWorldBorder().setDamageAmount(0.2);
+							worldBorderCollapseTime = 0; 
+						}
 					}
 				}
+				
 				
 				// COMPASS TRACKING
 				for (Player player : ServerManager.getLivingPlayers()) {

@@ -17,6 +17,7 @@ public enum ConfigProperty {
 	// World border
 	world_border_max_size("world-border.max-size", 128), // Max world size dimension in blocks
 	world_border_min_size("world-border.min-size", 2), // Min world size dimension in blocks
+	world_border_collapse("world-border.collapse", true), // Enable the world collapse feature
 	world_border_collapse_counter_seconds("world-border.collapse-counter-seconds", 60), // How many seconds to reduce world border by collapse-radius value
 	world_border_collapse_radius("world-border.collapse-radius", 20), // World border collapse radius
 	

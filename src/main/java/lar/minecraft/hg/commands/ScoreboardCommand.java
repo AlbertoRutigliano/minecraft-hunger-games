@@ -15,6 +15,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import lar.minecraft.hg.entities.PlayerExtra;
+import lar.minecraft.hg.enums.Cmp;
 import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerManager;
@@ -28,7 +29,7 @@ public class ScoreboardCommand implements CommandExecutor, TabExecutor {
 		
 		if (args.length == 1) {
 			// Global scoreboard
-			if (args[0].equalsIgnoreCase("global")) {
+			if (args[0].equalsIgnoreCase(Cmp.global)) {
 				player.sendMessage(MessageUtils.getMessage(MessageKey.scoreboard_list_header_global));
 				
 				// Get global scoreboard

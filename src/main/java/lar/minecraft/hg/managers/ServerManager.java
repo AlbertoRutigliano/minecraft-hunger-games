@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -18,6 +19,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import lar.minecraft.hg.ServerSchedulers;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.ConfigProperty;
@@ -49,20 +51,8 @@ public class ServerManager {
 	}
 	
 	public static void spawnSupplyDrop() {
-		// Get the spawn location
-        Location spawnLocation = SpigotPlugin.world.getSpawnLocation();
-
-        // Generate random offsets for X and Z coordinates
-        Random random = new Random();
-        int worldMaxSize = ConfigUtils.getInt(ConfigProperty.world_border_max_size);
-        int offsetX = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
-        int offsetZ = random.nextInt((worldMaxSize/2)+1) - worldMaxSize/2; // Random value between -worldMaxSize/2 and worldMaxSize/2
-
-        // Apply offsets to the spawn location
-        Location randomLocation = spawnLocation.clone().add(offsetX, 0, offsetZ);
-
-        // Find the highest block at the random location
-        Location chestLocation = randomLocation.getWorld().getHighestBlockAt(randomLocation).getLocation().add(0, 1, 0);;
+		// Generate random location inside world border for the chest
+        Location chestLocation = getSurfaceRandomLocation(ServerSchedulers.getWorldBorderSize(), SpigotPlugin.newSpawnLocation, 0, 1, 0);
         
         // Create a chest block at the spawn location
         Block block = chestLocation.getBlock();
@@ -84,12 +74,6 @@ public class ServerManager {
             items.add(new ItemStackProbability(Material.WATER_BUCKET, 0.15));
             items.add(new ItemStackProbability(Material.DIAMOND_SWORD, 0.05));
             items.add(new ItemStackProbability(Material.ENDER_PEARL, 0.25, 4, 12));
-
-            /* This code should add empty spaces in the chest but seems not working
-            int itemsToAdd = items.size();
-            for (int i = itemsToAdd; i < 27; i++) { // 27 is the max inventory size
-            	items.add(new ItemStackProbability(Material.AIR, 1.0)); // Add an empty slot
-            }*/
             
             Collections.shuffle(items);
             items.forEach(i-> chestInventory.addItem(i));
@@ -98,6 +82,21 @@ public class ServerManager {
         ServerManager.sendSound(Sound.BLOCK_BELL_USE);
         chest.getWorld().strikeLightning(chestLocation);
         Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.supply_drop, chestLocation.getX(), chestLocation.getY(), chestLocation.getZ()));
+	}
+	
+	public static Location getSurfaceRandomLocation(int range, Location startingLocation, int xOffset, int yOffset, int zOffset) {
+		// Generate random offsets for X and Z coordinates
+		Random random = ThreadLocalRandom.current();
+		int offsetX = random.nextInt(range/2) - random.nextInt(range/2); // Random value between -range/2 and range/2
+		int offsetZ = random.nextInt(range/2) - random.nextInt(range/2); // Random value between -range/2 and range/2
+
+		// Apply offsets to the spawn location
+		Location randomLocation = startingLocation.clone().add(offsetX, 0, offsetZ);
+
+		// Find the highest block at the random location
+		Location resultLocation = randomLocation.getWorld().getHighestBlockAt(randomLocation).getLocation().add(xOffset, yOffset, zOffset);
+		
+		return(resultLocation);
 	}
 		
 	public static void restartServer() {
