@@ -29,6 +29,7 @@ import lar.minecraft.hg.entities.ItemStackProbability;
 import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.utils.MessageUtils;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -127,7 +128,7 @@ public class ServerManager {
 			// Empty the text that will be added to the page for each page in order to have a clear one
 			// Add the command description, if it is premium and command to select it
 			commandInstructions.setLength(0);
-			commandInstructions.append(c.getDescription());
+			commandInstructions.append(ChatColor.GRAY + c.getDescription());
 			commandInstructions.append("\n\n");
 			if (c.isPremium()) {
 				commandInstructions.append(MessageUtils.getMessage(MessageKey.class_instructions_premium));

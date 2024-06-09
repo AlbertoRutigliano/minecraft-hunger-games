@@ -39,6 +39,7 @@ public class PlayerManager implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
+		event.setJoinMessage(null);
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
 			// Teleport each player to a random location 
 			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
@@ -79,7 +80,6 @@ public class PlayerManager implements Listener {
 			createPlayerLocationBossBar(player);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
-			event.setJoinMessage(null);
 			player.setGameMode(GameMode.SPECTATOR);
 		}
 	}
@@ -117,6 +117,7 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
+		event.setQuitMessage(null);
 		if (SpigotPlugin.isWinning() || SpigotPlugin.isLobby()) { 
 			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
 		}
