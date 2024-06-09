@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -26,9 +27,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
-import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.MessageKey;
-import lar.minecraft.hg.utils.ConfigUtils;
 import lar.minecraft.hg.utils.MessageUtils;
 
 public class PlayerManager implements Listener {
@@ -45,8 +44,11 @@ public class PlayerManager implements Listener {
 			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
 			player.teleport(spawnLocation);
 
+			// Set player gamemode, send welcome message and give instructions book
 			player.setGameMode(GameMode.ADVENTURE);
 			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
+			player.sendMessage(MessageUtils.getMessage(MessageKey.welcome_message));
+			player.getInventory().addItem(ServerManager.getGameInstructionsBook());
 			
 			// Check if the player is the winner of the last match or he is premium and create PlayerExtra to track it
 			String lastWinner = DatabaseManager.getLastWinner(SpigotPlugin.serverId);
@@ -73,6 +75,7 @@ public class PlayerManager implements Listener {
 			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), player.getName(), isLastWinner, isPremium, winCount);
 			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
 			
+			// Used to track player position witouth pressing F3
 			createPlayerLocationBossBar(player);
 		}
 		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
@@ -126,6 +129,20 @@ public class PlayerManager implements Listener {
 		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
 		if (playerExtra != null && playerExtra.isLastWinner()) {
 			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+		}
+	}
+	
+	/**
+	 * Player drop item event
+	 * @param event
+	 */
+	@EventHandler
+	public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
+		// Check if player thrown the Instruction Book and block the event
+		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) { 
+			if(event.getItemDrop().getItemStack().getType() == Material.WRITTEN_BOOK) {
+				event.setCancelled(true);
+			}
 		}
 	}
 	

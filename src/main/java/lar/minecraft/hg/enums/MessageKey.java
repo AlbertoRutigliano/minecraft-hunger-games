@@ -1,12 +1,17 @@
 package lar.minecraft.hg.enums;
 
 public enum MessageKey {
+	welcome_message,
 	current_phase,
 	class_selected,
 	class_selection_lobby,
 	class_wrong,
 	class_premium,
 	class_not_selected,
+	class_instructions,
+	class_instructions_premium,
+	class_instructions_materials,
+	class_instructions_select,
 	supply_drop_alert,
 	supply_drop,
 	last_match_win,

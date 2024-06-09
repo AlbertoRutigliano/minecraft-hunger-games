@@ -34,46 +34,20 @@ commands:
         usage:
           /<command> Show current game players that won the most match
           /<command> global Show global players that won the most match
-    bowman:
-        description: Shot other players with a bow and some arrows
+    class:
+        description: Use the command to select your class
         permission: perm.general
-        usage: /<command>
-    armored:
-        description: Cover yourself with a full iron armor set
-        permission: perm.general
-        usage: /<command>
-    doglover:
-        description: Tame the nature and kill other players with your dog
-        permission: perm.general
-        usage: /<command>
-    lavaman:
-        description: Burn BURN BURN!!!
-        permission: perm.general
-        usage: /<command>
-    miner:
-        description: Dig in, my friend!
-        permission: perm.general
-        usage: /<command>
-    mole:
-        description: Dig out, my friend!
-        permission: perm.general
-        usage: /<command>
-    ghost:
-        description: Let's get invisible
-        permission: perm.general
-        usage: /<command>
-    teleporter:
-        description: I'm here... not anymore
-        permission: perm.general
-        usage: /<command>
-    barbarian:
-        description: WWOOWOWOW
-        permission: perm.general
-        usage: /<command>
-    hardcore:
-        description: Are you crazy!?!?
-        permission: perm.general
-        usage: /<command>
+        usage:
+          /<command> bowman Shot other players with a bow and some arrows
+          /<command> armored Cover yourself with a full iron armor set
+          /<command> doglover Tame the nature and kill other players with your dog
+          /<command> lavaman Burn BURN BURN!!!
+          /<command> miner Dig in, my friend!
+          /<command> mole Dig out, my friend!
+          /<command> ghost Let's get invisible
+          /<command> teleporter I'm here... not anymore
+          /<command> barbarian WWOOWOWOW
+          /<command> hardcore Are you crazy!?!?
 permissions:
    perm.general:
       default: true

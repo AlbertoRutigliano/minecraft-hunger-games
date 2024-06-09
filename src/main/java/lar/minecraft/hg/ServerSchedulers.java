@@ -94,6 +94,7 @@ public class ServerSchedulers {
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
+			p.getInventory().addItem(ServerManager.getGameInstructionsBook());
 		});
 		gameStartTime = 0;
 		lobbyPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
