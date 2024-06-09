@@ -61,7 +61,7 @@ public enum PlayerClass {
 		@Override
 		public Map<String, Integer> getMaterials() {
 			Map<String, Integer> result = new HashMap<String, Integer>();
-			result.put("Leather Armor Set", 1);
+			result.put("LEATHER ARMOR SET", 1);
 			return result;
 		}
     },

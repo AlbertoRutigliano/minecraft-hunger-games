@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
@@ -60,11 +63,11 @@ public class ClassCommand implements CommandExecutor, TabExecutor {
 		List<String> completions = new ArrayList<>();
 		
 		if (args.length == 1) {
-			Arrays.asList(PlayerClass.values()).forEach(c -> {
-				completions.add(c.name());
-	        });
-			
-			return completions;
+		    List<String> tempList = Arrays.stream(PlayerClass.values())
+		                                  .map(Enum::name)
+		                                  .collect(Collectors.toList());
+		    StringUtil.copyPartialMatches(args[0], tempList, completions);
+		    return completions;
 		}
 		
 		Collections.sort(completions);
