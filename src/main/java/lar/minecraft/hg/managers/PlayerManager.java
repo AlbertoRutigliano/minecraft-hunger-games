@@ -48,7 +48,7 @@ public class PlayerManager implements Listener {
 			// Set player gamemode, send welcome message and give instructions book
 			player.setGameMode(GameMode.ADVENTURE);
 			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
-			player.sendMessage(MessageUtils.getMessage(MessageKey.welcome_message));
+			player.sendMessage(MessageUtils.getMessage(MessageKey.welcome_message, player.getDisplayName()));
 			player.getInventory().addItem(ServerManager.getGameInstructionsBook());
 			
 			// Check if the player is the winner of the last match or he is premium and create PlayerExtra to track it

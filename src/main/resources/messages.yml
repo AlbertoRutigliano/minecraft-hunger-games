@@ -1,5 +1,5 @@
 #Use this site to color code generator: https://minecraftitemids.com/color-codes#generator
-welcome_message: "Choose a class and prepare to fight!" 
+welcome_message: "&7Welcome {0}. Choose a class and prepare to &cfight&7!" 
 current_phase: "&7Current phase is &6{0}"
 class_selection_lobby: "Class selection is available only in lobby"
 class_selected: 
@@ -10,8 +10,8 @@ class_wrong: "&7There's no &6&m{0}&7 class"
 class_premium: "&7You must have won last match or be &6premium &7to use this class!"
 class_not_selected: "&7Class selection is only available before starting the game"
 class_instructions: "&0/class &6{0}"
-class_instructions_premium: "&c PREMIUM CLASS"
-class_instructions_materials: "&7 -{1} x {0}"
+class_instructions_premium: "&cPREMIUM CLASS"
+class_instructions_materials: "&7 - {1} x {0}"
 class_instructions_select: "Click to select class"
 supply_drop_alert: "&fA &6supply drop chest &fwill be spawned in &6{0} &fseconds"
 supply_drop: "&7Supply chest dropped at XYZ:&2&o {0} / {1} / {2}"
