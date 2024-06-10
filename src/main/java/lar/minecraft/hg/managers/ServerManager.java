@@ -88,7 +88,6 @@ public class ServerManager {
             items.forEach(i-> chestInventory.addItem(i));
         } while (chestInventory.isEmpty()); // To make sure that the chest is not completely empty
         
-        ServerManager.sendSound(Sound.BLOCK_BELL_USE);
         chest.getWorld().strikeLightning(chestLocation);
         Bukkit.broadcastMessage(MessageUtils.getMessage(MessageKey.supply_drop, chestLocation.getX(), chestLocation.getY(), chestLocation.getZ()));
 	}
