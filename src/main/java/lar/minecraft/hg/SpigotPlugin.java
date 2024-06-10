@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Properties;
 
 import org.bukkit.Difficulty;
@@ -20,7 +19,6 @@ import lar.minecraft.hg.commands.TestCommand;
 import lar.minecraft.hg.enums.Cmd;
 import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.HGPhase;
-import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.managers.DatabaseManager;
 import lar.minecraft.hg.managers.PlayerManager;
 import lar.minecraft.hg.managers.ServerManager;
@@ -109,11 +107,10 @@ public class SpigotPlugin extends JavaPlugin {
         // Enable game commands
         getCommand(Cmd.scoreboard).setExecutor(new ScoreboardCommand());
 		getCommand(Cmd.scoreboard).setTabCompleter(new ScoreboardCommand());
-        
+		
         // Enable class selection commands
-        Arrays.asList(PlayerClass.values()).forEach(c -> {
-        	getCommand(c.name()).setExecutor(new ClassCommand());
-        });
+        getCommand(Cmd.class_command).setExecutor(new ClassCommand());
+		getCommand(Cmd.class_command).setTabCompleter(new ClassCommand());
         
         // Initialize PlayerManager listener
         getServer().getPluginManager().registerEvents(new PlayerManager(), this);

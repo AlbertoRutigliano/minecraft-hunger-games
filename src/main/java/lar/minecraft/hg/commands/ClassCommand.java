@@ -1,9 +1,17 @@
 package lar.minecraft.hg.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
@@ -12,35 +20,57 @@ import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.managers.PlayerManager;
 import lar.minecraft.hg.utils.MessageUtils;
 
-public class ClassCommand implements CommandExecutor {
-
+public class ClassCommand implements CommandExecutor, TabExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		PlayerClass cmdName = PlayerClass.valueOf(command.getName().toLowerCase());
-
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if (cmdName != null && !PlayerManager.playerExtras.isEmpty() && (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby())) {
-				PlayerExtra playerExtra = PlayerManager.playerExtras.get(player.getUniqueId());
+			
+			if (args.length == 1) {
+				PlayerClass className = PlayerClass.valueOf(args[0].toLowerCase());
 
-				if (playerExtra != null) {
-					// Check command selection: only premium users or who won last match can use premium classes
-					if (!cmdName.isPremium() || playerExtra.isPremium() || playerExtra.isLastWinner()) {
-						playerExtra.setPlayerClass(cmdName);
-						PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
-						player.sendMessage(MessageUtils.getMessage(MessageKey.class_selected, cmdName.name()));
-						player.playSound(player, cmdName.getSound(), 10.0f, 10.0f);
+				if (className != null && !PlayerManager.playerExtras.isEmpty() && (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby())) {
+					PlayerExtra playerExtra = PlayerManager.playerExtras.get(player.getUniqueId());
+
+					if (playerExtra != null) {
+						// Check command selection: only premium users or who won last match can use premium classes
+						if (!className.isPremium() || playerExtra.isPremium() || playerExtra.isLastWinner()) {
+							playerExtra.setPlayerClass(className);
+							PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
+							player.sendMessage(MessageUtils.getMessage(MessageKey.class_selected, className.name()));
+							player.playSound(player, className.getSound(), 10.0f, 10.0f);
+						} else {
+							player.sendMessage(MessageUtils.getMessage(MessageKey.class_premium));
+						}
 					} else {
-						player.sendMessage(MessageUtils.getMessage(MessageKey.class_premium));
+						player.sendMessage(MessageUtils.getMessage(MessageKey.class_not_selected));
+						return true;
 					}
 				} else {
-					return false;
+					player.sendMessage(MessageUtils.getMessage(MessageKey.class_not_selected));
 				}
 			} else {
 				player.sendMessage(MessageUtils.getMessage(MessageKey.class_not_selected));
+				return true;
 			}
 		}
+		
 		return true;
 	}
-
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		List<String> completions = new ArrayList<>();
+		
+		if (args.length == 1) {
+		    List<String> tempList = Arrays.stream(PlayerClass.values())
+		                                  .map(Enum::name)
+		                                  .collect(Collectors.toList());
+		    StringUtil.copyPartialMatches(args[0], tempList, completions);
+		    return completions;
+		}
+		
+		Collections.sort(completions);
+		return Collections.emptyList();
+	}
 }
