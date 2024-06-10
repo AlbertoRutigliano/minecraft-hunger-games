@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -144,6 +145,17 @@ public class PlayerManager implements Listener {
 			if(event.getItemDrop().getItemStack().getType() == Material.WRITTEN_BOOK) {
 				event.setCancelled(true);
 			}
+		}
+	}
+	
+	/**
+	 * Mutes spectator players
+	 * @param event
+	 */
+	@EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+		if (event.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
+			event.setCancelled(true);
 		}
 	}
 	
