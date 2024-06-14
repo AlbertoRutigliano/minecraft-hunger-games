@@ -22,7 +22,7 @@
     <properties>
         <author>Luca Acquafredda and Alberto Rutigliano</author>
         <mainClass>lar.minecraft.hg.SpigotPlugin</mainClass>
-        <apiVersion>1.20</apiVersion>
+        <apiVersion>1.21</apiVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.20.6-R0.1-SNAPSHOT</version>
+            <version>1.21-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
     		<groupId>mysql</groupId>
