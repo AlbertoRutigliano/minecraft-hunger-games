@@ -41,6 +41,8 @@ public class PlayerManager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		event.setJoinMessage(null);
+		//Log player join on database
+		DatabaseManager.addPlayer(player);
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
 			// Teleport each player to a random location 
 			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
