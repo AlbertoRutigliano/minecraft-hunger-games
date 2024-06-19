@@ -94,9 +94,27 @@ public class DatabaseManager {
 		if (isDatabaseEnabled()) {
 			try {
 				Statement statementCreate = dbConnection.createStatement();
-				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS hg_games (server_id int NOT NULL, id int NOT NULL, winner_uuid varchar(100), win_datetime datetime)");
-				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS played_hg_games (server_id int NOT NULL, id int NOT NULL, player_uuid varchar(100))");
-				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS players (uuid varchar(100), name varchar(100))");
+				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS `hg_games` ("
+										  	+ " `server_id` int(11) NOT NULL,"
+										  	+ " `id` int(11) NOT NULL,"
+										  	+ " `winner_uuid` varchar(100) DEFAULT NULL,"
+										  	+ " `win_datetime` datetime DEFAULT NULL,"
+										  	+ " `game_start_datetime` datetime DEFAULT NULL,"
+										  	+ " UNIQUE KEY `hg_games_server_id_IDX` (`server_id`,`id`) USING BTREE"
+										  	+ " )");
+				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS `played_hg_games` ("
+											+ " `server_id` int(11) NOT NULL,"
+										  	+ " `id` int(11) NOT NULL,"
+										  	+ " `player_uuid` varchar(100) NOT NULL,"
+										  	+ " UNIQUE KEY `played_hg_games_server_id_IDX` (`server_id`,`id`,`player_uuid`) USING BTREE"
+										  	+ " )");
+				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS `players` ("
+											+ " `uuid` varchar(100) NOT NULL,"
+										  	+ " `name` varchar(100) NOT NULL,"
+										  	+ " `premium_expire_date` date DEFAULT NULL,"
+										  	+ " `last_time_online` datetime DEFAULT NULL,"
+										  	+ " UNIQUE KEY `players_uuid_IDX` (`uuid`) USING BTREE"
+										  	+ " )");
 				statementCreate.executeUpdate("CREATE OR REPLACE"
 											+ " ALGORITHM = UNDEFINED VIEW `hunger_games`.`v_Scoreboard` AS ("
 											+ " select"
@@ -108,6 +126,20 @@ public class DatabaseManager {
 											+ "     ((`hunger_games`.`players`.`uuid` = `hunger_games`.`hg_games`.`winner_uuid`)))"
 											+ " group by"
 											+ "     `hunger_games`.`hg_games`.`winner_uuid`);");
+				statementCreate.executeUpdate("CREATE OR REPLACE"
+											+ " ALGORITHM = UNDEFINED VIEW `v_players` AS ("
+											+ " select"
+											+ "`players`.`uuid` AS `uuid`,"
+										    + " `players`.`name` AS `name`,"
+										    + " (case"
+										    + " when ((`players`.`premium_expire_date` is not null)"
+							        		+ " 				        and (curdate() <= `players`.`premium_expire_date`)) then 1"
+									        + " else 0"
+										    + " end) AS `premium`,"
+										    + " `players`.`premium_expire_date` AS `premium_expire_date`,"
+										    + " `players`.`last_time_online` AS `last_time_online`"
+											+ " from"
+											+ "`players`);");
 				statementCreate.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -166,6 +198,35 @@ public class DatabaseManager {
 	}
 	
 	/**
+	 * Add player or update the existing record into players table
+	 * @param player
+	 */
+	public static void addPlayer(Player player) {
+		if (isDatabaseEnabled()) {
+			try {
+				Statement statementRead = dbConnection.createStatement();
+				Statement statementInsert = dbConnection.createStatement();
+				
+				//Add player into players table if not existing
+				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT COUNT(*) AS playerFound FROM players WHERE uuid = '%s';", player.getUniqueId().toString()));
+				while (resultSet.next()) {
+					int foundRows = resultSet.getInt("playerFound");
+					if (foundRows == 0) {
+						statementInsert.executeUpdate(String.format("INSERT INTO players (uuid, name, last_time_online) VALUES ('%s', '%s', NOW());", player.getUniqueId(), player.getName()));
+					}else {
+						statementInsert.executeUpdate(String.format("UPDATE players SET last_time_online = NOW() WHERE uuid = '%s';", player.getUniqueId()));
+					}
+				}
+				
+				statementRead.close();
+				statementInsert.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
 	 * Save the information of all players that joined the game
 	 * @param ServerId
 	 * @param HGGameId
@@ -178,16 +239,10 @@ public class DatabaseManager {
 				Statement statementInsert = dbConnection.createStatement();
 				
 				//Add player into players table if not existing
-				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT COUNT(*) AS playerFound FROM players WHERE uuid = '%s';", player.getUniqueId().toString()));
-				while (resultSet.next()) {
-					int foundRows = resultSet.getInt("playerFound");
-					if (foundRows == 0) {
-						statementInsert.executeUpdate(String.format("INSERT INTO players (uuid, name) VALUES ('%s', '%s');", player.getUniqueId(), player.getName()));
-					}
-				}
+				DatabaseManager.addPlayer(player);
 	
 				//Add player into played hg games if not existing
-				resultSet = statementRead.executeQuery(String.format("SELECT COUNT(*) AS playerFound FROM played_hg_games WHERE server_id = %d AND id = %d AND player_uuid = '%s';", ServerId, HGGameId, player.getUniqueId().toString()));			
+				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT COUNT(*) AS playerFound FROM played_hg_games WHERE server_id = %d AND id = %d AND player_uuid = '%s';", ServerId, HGGameId, player.getUniqueId().toString()));			
 				while (resultSet.next()) {
 					int foundRows = resultSet.getInt("playerFound");
 					if (foundRows == 0) {
@@ -257,7 +312,7 @@ public class DatabaseManager {
 		if (isDatabaseEnabled()) {
 			try {
 				Statement statementRead = dbConnection.createStatement();
-				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT premium FROM players WHERE uuid = '%s';", playerUUID));
+				ResultSet resultSet = statementRead.executeQuery(String.format("SELECT premium FROM v_players WHERE uuid = '%s';", playerUUID));
 				boolean isPremium = false;
 				
 				while (resultSet.next()) {
