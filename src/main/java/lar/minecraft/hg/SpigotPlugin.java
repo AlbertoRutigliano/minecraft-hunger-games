@@ -161,4 +161,8 @@ public class SpigotPlugin extends JavaPlugin {
     public static boolean isPlaying() {
     	return phase.equals(HGPhase.PLAYING);
     }
+    
+    public static boolean isEnded() {
+    	return phase.equals(HGPhase.ENDED);
+    }
 }

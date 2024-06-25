@@ -5,7 +5,8 @@ public enum HGPhase {
 	LOBBY,
 	SAFE_AREA,
 	PLAYING,
-	WINNING;
+	WINNING,
+	ENDED;
 	
 	@Override
 	public String toString() {
