@@ -65,6 +65,10 @@ public class ServerSchedulers {
 	public static void waitingPhase() {
 		SpigotPlugin.setPhase(HGPhase.WAITING);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
+		// Register new HungerGames game on Database
+		currentHGGameId = DatabaseManager.createHGGame(SpigotPlugin.serverId);
+		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, HGPhase.WAITING.name());
+		
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
@@ -91,10 +95,11 @@ public class ServerSchedulers {
 	public static void lobbyPhase() {
 		SpigotPlugin.setPhase(HGPhase.LOBBY);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
+		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, HGPhase.LOBBY.name());
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
-			p.getInventory().addItem(ServerManager.getGameInstructionsBook());
+			p.getInventory().addItem(ServerManager.getGameInstructionsBook(PlayerManager.playerExtras.get(p.getUniqueId())));
 		});
 		gameStartTime = 0;
 		lobbyPhaseTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {
@@ -127,9 +132,7 @@ public class ServerSchedulers {
 	public static void safeAreaPhase() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
-		
-		// Register new HungerGames game on Database
-		currentHGGameId = DatabaseManager.createHGGame(SpigotPlugin.serverId);
+		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, HGPhase.SAFE_AREA.name());
 		
 		safeAreaTime = 0;
 		// Notify all players that Hunger Games is starting
@@ -179,6 +182,7 @@ public class ServerSchedulers {
 	public static void playingPhase() {
 		SpigotPlugin.setPhase(HGPhase.PLAYING);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
+		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, HGPhase.PLAYING.name());
 		
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
@@ -284,6 +288,7 @@ public class ServerSchedulers {
 	private static void fireworkEffect(Player winner) {
 		SpigotPlugin.setPhase(HGPhase.WINNING);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
+		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, HGPhase.WINNING.name());
 		
 		fireworksEffectsTime = 0;
 		fireworksEffectsTaskId = server.getScheduler().scheduleSyncRepeatingTask(plugin,  new Runnable() {

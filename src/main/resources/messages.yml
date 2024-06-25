@@ -8,6 +8,7 @@ class_selected:
   - "&6{0}&7 class selected!"
 class_wrong: "&7There's no &6&m{0}&7 class"
 class_premium: "&7You must have won last match or be &6premium &7to use this class!"
+become_premium_link: "http://185.25.204.223/lar-hunger-games/index.php?uuid={0}"
 class_not_selected: "&7Class selection is only available before starting the game"
 class_instructions: "&0/class &6{0}"
 class_instructions_premium: "&cPREMIUM CLASS"

@@ -7,6 +7,7 @@ public enum MessageKey {
 	class_selection_lobby,
 	class_wrong,
 	class_premium,
+	become_premium_link,
 	class_not_selected,
 	class_instructions,
 	class_instructions_premium,

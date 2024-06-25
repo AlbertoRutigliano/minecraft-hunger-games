@@ -100,6 +100,7 @@ public class DatabaseManager {
 										  	+ " `winner_uuid` varchar(100) DEFAULT NULL,"
 										  	+ " `win_datetime` datetime DEFAULT NULL,"
 										  	+ " `game_start_datetime` datetime DEFAULT NULL,"
+										  	+ " `game_phase` varchar(100) DEFAULT NULL,"
 										  	+ " UNIQUE KEY `hg_games_server_id_IDX` (`server_id`,`id`) USING BTREE"
 										  	+ " )");
 				statementCreate.executeUpdate("CREATE TABLE IF NOT EXISTS `played_hg_games` ("
@@ -116,16 +117,17 @@ public class DatabaseManager {
 										  	+ " UNIQUE KEY `players_uuid_IDX` (`uuid`) USING BTREE"
 										  	+ " )");
 				statementCreate.executeUpdate("CREATE OR REPLACE"
-											+ " ALGORITHM = UNDEFINED VIEW `hunger_games`.`v_Scoreboard` AS ("
+											+ " ALGORITHM = UNDEFINED VIEW `v_Scoreboard` AS ("
 											+ " select"
-											+ "     `hunger_games`.`players`.`name` AS `name`,"
-											+ "     count(`hunger_games`.`hg_games`.`winner_uuid`) AS `wins_count`"
+							    			+ " `players`.`uuid` AS `uuid`,"
+							    			+ " `players`.`name` AS `name`,"
+							    			+ " count(`hg_games`.`winner_uuid`) AS `wins_count`"
 											+ " from"
-											+ "     (`hunger_games`.`hg_games`"
-											+ " right outer join `hunger_games`.`players` on"
-											+ "     ((`hunger_games`.`players`.`uuid` = `hunger_games`.`hg_games`.`winner_uuid`)))"
+							    			+ " (`players`"
+											+ " left join `hg_games` on"
+							    			+ " ((`players`.`uuid` = `hg_games`.`winner_uuid`)))"
 											+ " group by"
-											+ "     `hunger_games`.`hg_games`.`winner_uuid`);");
+							    			+ " `players`.`uuid`);");
 				statementCreate.executeUpdate("CREATE OR REPLACE"
 											+ " ALGORITHM = UNDEFINED VIEW `v_players` AS ("
 											+ " select"
@@ -190,6 +192,23 @@ public class DatabaseManager {
 			try {
 				Statement statementUpdate = dbConnection.createStatement();
 				statementUpdate.executeUpdate(String.format("UPDATE hg_games SET game_start_datetime = NOW() WHERE server_id = %d AND id = %d;", ServerId, HGGameId));
+				statementUpdate.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * Save game phase
+	 * @param ServerId
+	 * @param HGGameId
+	 */
+	public static void saveGamePhase(int ServerId, int HGGameId, String phase) {
+		if (isDatabaseEnabled()) {
+			try {
+				Statement statementUpdate = dbConnection.createStatement();
+				statementUpdate.executeUpdate(String.format("UPDATE hg_games SET game_phase = '%s' WHERE server_id = %d AND id = %d;", phase, ServerId, HGGameId));
 				statementUpdate.close();
 			} catch (SQLException e) {
 				e.printStackTrace();

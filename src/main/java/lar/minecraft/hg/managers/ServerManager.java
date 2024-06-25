@@ -26,6 +26,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import lar.minecraft.hg.ServerSchedulers;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.ItemStackProbability;
+import lar.minecraft.hg.entities.PlayerExtra;
 import lar.minecraft.hg.enums.MessageKey;
 import lar.minecraft.hg.enums.PlayerClass;
 import lar.minecraft.hg.utils.MessageUtils;
@@ -112,7 +113,7 @@ public class ServerManager {
 	 * Each class is in a single page
 	 * @return An book with the instruction and materials for each class
 	 */
-	public static ItemStack getGameInstructionsBook() {
+	public static ItemStack getGameInstructionsBook(PlayerExtra playerExtra) {
 		// Prepare the book
 		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 
@@ -122,6 +123,25 @@ public class ServerManager {
 	    meta.setAuthor(SpigotPlugin.class.getName());
 		
 		StringBuilder commandInstructions = new StringBuilder();
+		commandInstructions.append(ChatColor.GRAY); 
+		commandInstructions.append("Welcome in " + ChatColor.DARK_RED + "Minecraft Hunger Games.");
+		commandInstructions.append("\n\n");
+		commandInstructions.append(ChatColor.GRAY + "Choose a class and prepare to fight.");
+		commandInstructions.append("\n");
+		if (!playerExtra.isPremium()) {
+			commandInstructions.append("You must win last match on this server or become premium to choose " + ChatColor.RED + "premium" + ChatColor.GRAY + " classes.");
+			commandInstructions.append("\n\n");
+			commandInstructions.append(ChatColor.BLACK + "Do not waste time.");
+			commandInstructions.append("\n");
+			commandInstructions.append(ChatColor.RED + "BECOME PREMIUM NOW");
+			commandInstructions.append("\n");
+			BaseComponent[] page = new ComponentBuilder(commandInstructions.toString())
+			        .event(new ClickEvent(ClickEvent.Action.OPEN_URL, MessageUtils.getMessage(MessageKey.become_premium_link, playerExtra.getUuid().toString())))
+			        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to buy premium")))
+			        .create();
+			
+		    meta.spigot().addPage(page);
+		}
 		
 		Arrays.asList(PlayerClass.values()).forEach(c -> {
 			// Empty the text that will be added to the page for each page in order to have a clear one

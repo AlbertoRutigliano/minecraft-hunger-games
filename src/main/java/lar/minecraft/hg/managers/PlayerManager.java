@@ -48,12 +48,6 @@ public class PlayerManager implements Listener {
 			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
 			player.teleport(spawnLocation);
 
-			// Set player gamemode, send welcome message and give instructions book
-			player.setGameMode(GameMode.ADVENTURE);
-			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
-			player.sendMessage(MessageUtils.getMessage(MessageKey.welcome_message, player.getDisplayName()));
-			player.getInventory().addItem(ServerManager.getGameInstructionsBook());
-			
 			// Check if the player is the winner of the last match or he is premium and create PlayerExtra to track it
 			String lastWinner = DatabaseManager.getLastWinner(SpigotPlugin.serverId);
 			boolean isLastWinner = false;
@@ -74,10 +68,17 @@ public class PlayerManager implements Listener {
 					}, 20, 10); // 1 second = 20 ticks
 				}
 			}
+
 			boolean isPremium = DatabaseManager.isPlayerPremium(player.getUniqueId().toString());
 			int winCount = DatabaseManager.getPlayerWinCount(player.getUniqueId().toString());
 			PlayerExtra playerExtra = new PlayerExtra(player.getUniqueId(), player.getName(), isLastWinner, isPremium, winCount);
 			PlayerManager.playerExtras.put(player.getUniqueId(), playerExtra);
+			
+			// Set player gamemode, send welcome message and give instructions book
+			player.setGameMode(GameMode.ADVENTURE);
+			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
+			player.sendMessage(MessageUtils.getMessage(MessageKey.welcome_message, player.getDisplayName()));
+			player.getInventory().addItem(ServerManager.getGameInstructionsBook(playerExtra));
 			
 			// Used to track player position witouth pressing F3
 			createPlayerLocationBossBar(player);
