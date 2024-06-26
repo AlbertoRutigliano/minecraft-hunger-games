@@ -113,7 +113,21 @@ public class PlayerManager implements Listener {
 		}
 		
 		ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-		retrieveKilledPlayerHead(event);
+		
+		// Check if the killer is a player
+        if (event.getEntity().getKiller() != null) {
+            // Get the player who was killed and the killer
+            Player killer = deathPlayer.getKiller();
+            // Give the killer the head of the killed player
+            killer.getInventory().addItem(retrievePlayerHead(deathPlayer));
+            
+            // Check if killer used a compass
+            ItemStack weapon = killer.getInventory().getItemInMainHand();
+            if (weapon != null && weapon.getType() == Material.COMPASS) {
+                // Do not print kill message when using a compass
+            	event.setDeathMessage(null);
+            }
+        }
 	}
 	
 	/**
@@ -170,38 +184,39 @@ public class PlayerManager implements Listener {
             if (!(entity instanceof Player)) continue;
             if (entity == player) continue;
             
-            double distanceTo = player.getLocation().distance(entity.getLocation());
+            Player foundPlayer = (Player)entity;
+            if (foundPlayer.getGameMode() == GameMode.SPECTATOR) continue;
+            
+            double distanceTo = player.getLocation().distance(foundPlayer.getLocation());
             if (distanceTo < distance) {
                 distance = distanceTo;
-                target = (Player) entity;
+                target = foundPlayer;
             }
         }
         return target;
     }
 	
-	/*
-	 * If a Player kill another Player he receive the killedPlayer head as prize
+	/**
+	 * Retrieve the head of the specified player
+	 * @param player The player from which retrieve the head
+	 * @return The player head
 	 */
-	private void retrieveKilledPlayerHead(PlayerDeathEvent event) {
-		Player killedPlayer = event.getEntity().getPlayer();
-		// Check if the killer is a player
-        if (event.getEntity().getKiller() != null) {
-            // Get the player who was killed and the killer
-            Player killer = killedPlayer.getKiller();
-            
-            // Create the player head item
-            ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-            SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
-            if (skullMeta != null) {
-                skullMeta.setOwningPlayer(killedPlayer);
-                playerHead.setItemMeta(skullMeta);
-            }
-            // Give the killer the head of the killed player
-            killer.getInventory().addItem(playerHead);
+	private ItemStack retrievePlayerHead(Player player) {
+        // Create the player head item
+        ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
+        SkullMeta skullMeta = (SkullMeta) playerHead.getItemMeta();
+        if (skullMeta != null) {
+            skullMeta.setOwningPlayer(player);
+            playerHead.setItemMeta(skullMeta);
         }
+
+        return playerHead;
 	}
-	
     
+	/**
+	 * Create a BossBar for the player and print his coordinates above the bossbar
+	 * @param player
+	 */
     private void createPlayerLocationBossBar(Player player) {
         BossBar bossBar = Bukkit.createBossBar(player.getDisplayName() + " location", BarColor.WHITE, BarStyle.SOLID);
         bossBar.addPlayer(player);
