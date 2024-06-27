@@ -56,6 +56,7 @@ public class PlayerManager implements Listener {
 				isLastWinner = player.getUniqueId().compareTo(UUID.fromString(lastWinner)) == 0 ? true : false;
 				if (isLastWinner) {
 					player.sendMessage(MessageUtils.getMessage(MessageKey.last_match_win));
+					player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 10.0f, 1.0f);
 					
 					// Run a task to spawn particles effects to signal that he is the winner!
 					winnerParticleEffectTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
@@ -93,7 +94,7 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent event) {
-		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart()) {
+		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart() || SpigotPlugin.isEnded()) {
 			event.setCancelled(true);
 		}
 	}
