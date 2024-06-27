@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -86,6 +87,7 @@ public class SpigotPlugin extends JavaPlugin {
 		ServerSchedulers.init(this);
     	serverId = ConfigUtils.getInt(ConfigProperty.server_id);
     	world.setDifficulty(Difficulty.NORMAL);
+    	world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
     	
     	// Initialize MessageUtils for messages
     	MessageUtils.init();
