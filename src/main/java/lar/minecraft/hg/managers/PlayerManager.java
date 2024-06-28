@@ -80,6 +80,9 @@ public class PlayerManager implements Listener {
 			player.playSound(player, Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 1.0f);
 			player.sendMessage(MessageUtils.getMessage(MessageKey.welcome_message, player.getDisplayName()));
 			player.getInventory().addItem(ServerManager.getGameInstructionsBook(playerExtra));
+			if (isPremium) {
+				player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 10.0f, 1.0f);
+			}
 			
 			// Used to track player position witouth pressing F3
 			createPlayerLocationBossBar(player);
