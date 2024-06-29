@@ -35,7 +35,7 @@ public class PlayerManager implements Listener {
 
 	public static Map<UUID, PlayerExtra> playerExtras = new HashMap<>();
 	
-	private int winnerParticleEffectTaskId = 0;
+	private int winnerParticleEffectTaskId = -1;
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
@@ -62,7 +62,7 @@ public class PlayerManager implements Listener {
 					winnerParticleEffectTaskId = SpigotPlugin.server.getScheduler().scheduleSyncRepeatingTask(SpigotPlugin.getPlugin(SpigotPlugin.class),  new Runnable() {
 						@Override
 						public void run() {
-							if (PlayerManager.playerExtras.get(player.getUniqueId()).isLastWinner()) {
+							if (PlayerManager.playerExtras.get(player.getUniqueId()) != null && PlayerManager.playerExtras.get(player.getUniqueId()).isLastWinner()) {
 								SpigotPlugin.server.getWorld(player.getWorld().getName()).spawnParticle(Particle.DRAGON_BREATH, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 40, -0.5, 0.5, -0.5, 0.01);
 							}
 						}
@@ -140,6 +140,11 @@ public class PlayerManager implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
 		event.setQuitMessage(null);
+		// Stop reproducing particles of the winner player
+		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
+		if (playerExtra != null && playerExtra.isLastWinner()) {
+			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+		}
 		if (SpigotPlugin.isWinning() || SpigotPlugin.isLobby()) { 
 			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
 		}
@@ -147,11 +152,6 @@ public class PlayerManager implements Listener {
 			Player player = event.getPlayer();
 			player.getWorld().strikeLightningEffect(player.getLocation());
 			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-		}
-		// Stop reproducing particles of the winner player
-		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
-		if (playerExtra != null && playerExtra.isLastWinner()) {
-			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
 	}
 	
