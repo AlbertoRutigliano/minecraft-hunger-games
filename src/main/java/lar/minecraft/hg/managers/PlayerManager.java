@@ -65,7 +65,7 @@ public class PlayerManager implements Listener {
 						@Override
 						public void run() {
 							PotionEffect invisibilityPotionEffect = player.getPotionEffect(PotionEffectType.INVISIBILITY);
-							if (invisibilityPotionEffect != null && PlayerManager.playerExtras.get(player.getUniqueId()) != null && PlayerManager.playerExtras.get(player.getUniqueId()).isLastWinner()) {
+							if (invisibilityPotionEffect == null && PlayerManager.playerExtras.get(player.getUniqueId()) != null && PlayerManager.playerExtras.get(player.getUniqueId()).isLastWinner()) {
 								SpigotPlugin.server.getWorld(player.getWorld().getName()).spawnParticle(Particle.DRAGON_BREATH, player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 40, -0.5, 0.5, -0.5, 0.01);
 							}
 						}
@@ -148,10 +148,10 @@ public class PlayerManager implements Listener {
 		if (playerExtra != null && playerExtra.isLastWinner()) {
 			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
-		if (SpigotPlugin.isWinning() || SpigotPlugin.isLobby()) { 
+		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby() || SpigotPlugin.isWinning()) { 
 			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
 		}
-		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isPlaying()) {
+		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isPlaying() || SpigotPlugin.isWinning()) {
 			Player player = event.getPlayer();
 			player.getWorld().strikeLightningEffect(player.getLocation());
 			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
