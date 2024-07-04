@@ -14,9 +14,11 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -101,14 +103,31 @@ public class PlayerManager implements Listener {
 	 * Player damage event
 	 */
 	@EventHandler
-	public void onPlayerDamage(EntityDamageEvent event) {
-		if (!SpigotPlugin.isPlaying()) {
+	public void onEntityDamage(EntityDamageEvent event) {
+		// In SAFE_AREA phase Mobs can be hit by Players
+		if (SpigotPlugin.isSafeArea()) {
+			if (event instanceof EntityDamageByEntityEvent) {
+	            EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) event;
+	            if (entityDamageByEntityEvent.getDamager() instanceof Player && entityDamageByEntityEvent.getEntity() instanceof Mob) {
+					event.setCancelled(false);
+		        } else {
+		        	event.setCancelled(true);
+		        }
+			} else {
+				event.setCancelled(true);
+			}
+		}
+		
+		// The hit can be done only in PLAYING phase
+		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby() || SpigotPlugin.isWinning() || SpigotPlugin.isEnded()) {
 			event.setCancelled(true);
 		}
+		
 	}
 	
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		// Avoid to lose food level in all phases except for PLAYING and SAFE_AREA
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby() || SpigotPlugin.isWinning() || SpigotPlugin.isEnded()) {
 			event.setCancelled(true);
 		}
