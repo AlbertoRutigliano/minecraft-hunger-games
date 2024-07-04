@@ -179,7 +179,7 @@ public class PlayerManager implements Listener {
 	public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
 		// Check if player thrown the Instruction Book and block the event
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) { 
-			if(event.getItemDrop().getItemStack().getType() == Material.WRITTEN_BOOK) {
+			if(event.getItemDrop().getItemStack().getType().equals(Material.WRITTEN_BOOK)) {
 				event.setCancelled(true);
 			}
 		}
