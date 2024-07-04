@@ -92,7 +92,7 @@ public class PlayerManager implements Listener {
 			// Used to track player position witouth pressing F3
 			createPlayerLocationBossBar(player);
 		}
-		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea()) {
+		if (SpigotPlugin.isPlaying() || SpigotPlugin.isWinning() || SpigotPlugin.isSafeArea() || SpigotPlugin.isEnded()) {
 			player.setGameMode(GameMode.SPECTATOR);
 		}
 	}
