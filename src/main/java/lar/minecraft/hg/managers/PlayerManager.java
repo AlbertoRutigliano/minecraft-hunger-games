@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -101,7 +102,14 @@ public class PlayerManager implements Listener {
 	 */
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent event) {
-		if (SpigotPlugin.isLobby() || SpigotPlugin.isSafeArea() || SpigotPlugin.isWinning() || SpigotPlugin.isWaitingForStart() || SpigotPlugin.isEnded()) {
+		if (!SpigotPlugin.isPlaying()) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby() || SpigotPlugin.isWinning() || SpigotPlugin.isEnded()) {
 			event.setCancelled(true);
 		}
 	}
