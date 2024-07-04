@@ -17,6 +17,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import lar.minecraft.hg.entities.PlayerExtra;
 import lar.minecraft.hg.enums.ConfigProperty;
 import lar.minecraft.hg.enums.HGPhase;
 import lar.minecraft.hg.enums.MessageKey;
@@ -46,6 +47,10 @@ public class ServerSchedulers {
 	
 	public static int getWorldBorderSize() {
 		return worldBorderSize;
+	}
+	
+	public static int getCurentHGGameId() {
+		return currentHGGameId;
 	}
 	
 	private static long gameStartTime = 0;
@@ -146,11 +151,15 @@ public class ServerSchedulers {
 											, 0
 											, 2
 											, 0);
+
+			// Track players chosen class and track that played the current game
+			PlayerExtra tempPlayerExtra = PlayerManager.playerExtras.get(p.getUniqueId());
+			if (tempPlayerExtra.getPlayerClass() != null) {
+				DatabaseManager.updatePlayerClass(SpigotPlugin.serverId, currentHGGameId, p, tempPlayerExtra.getPlayerClass().toString());
+				DatabaseManager.setPlayerMatchPlayed(SpigotPlugin.serverId, currentHGGameId, p);
+			}
 			
 			p.teleport(spawnLocation);
-			
-			// Write player join on Database
-			DatabaseManager.addPlayerJoin(SpigotPlugin.serverId, currentHGGameId, p);
 		});
 		PlayerClassManager.giveClasses();
 		ServerManager.sendSound(Sound.EVENT_RAID_HORN);
@@ -182,8 +191,9 @@ public class ServerSchedulers {
 	public static void playingPhase() {
 		SpigotPlugin.setPhase(HGPhase.PLAYING);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
+		// Update game phase on database
 		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, SpigotPlugin.getPhase().name());
-		
+
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
 		server.setIdleTimeout(ConfigUtils.getInt(ConfigProperty.duration_idle_timeout));
@@ -242,7 +252,6 @@ public class ServerSchedulers {
 						winner.sendTitle("You win the Hunger Games!", null, 10, 70, 20);
 						winnerCelebrationsTime = execTime + (20 * ConfigUtils.getInt(ConfigProperty.duration_winner_celebrations));
 
-						// Save the winning player on Database
 						DatabaseManager.savePlayerWin(SpigotPlugin.serverId, currentHGGameId, winner);
 						fireworkEffect(winner);
 					}

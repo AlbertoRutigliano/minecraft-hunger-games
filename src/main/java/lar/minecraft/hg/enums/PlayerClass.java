@@ -137,7 +137,7 @@ public enum PlayerClass {
 			return result;
 		}
     },
-    teleporter (Sound.ENTITY_ENDERMAN_TELEPORT, "I'm here... not anymore", false) {
+    teleporter (Sound.ENTITY_ENDERMAN_TELEPORT, "I'm here... not anymore", true) {
         @Override
         public PlayerAction getAction() {
             return (player) -> {
@@ -182,7 +182,39 @@ public enum PlayerClass {
 			result.put(Material.CARVED_PUMPKIN.toString(), 1);
 			return result;
 		}
-    };
+    },
+    chef (Sound.ENTITY_GENERIC_EAT, "Wanna eat some food? Yes, Rice and Chicken", false) {
+        @Override
+        public PlayerAction getAction() {
+            return (player) -> {
+                player.getInventory().addItem(new ItemStack(Material.COOKED_CHICKEN, 5));
+                player.getInventory().addItem(new ItemStack(Material.SMOKER));
+            };
+        }
+
+		@Override
+		public Map<String, Integer> getMaterials() {
+			Map<String, Integer> result = new HashMap<String, Integer>();
+			result.put(Material.COOKED_CHICKEN.toString(), 5);
+			result.put(Material.SMOKER.toString(), 1);
+			return result;
+		}
+    },
+    exploder(Sound.ENTITY_GENERIC_EXPLODE, "..........BOOOOOM", true) {
+        @Override
+        public PlayerAction getAction() {
+            return (player) -> {
+                player.getInventory().addItem(new ItemStack(Material.FIRE_CHARGE, 5));
+            };
+        }
+
+		@Override
+		public Map<String, Integer> getMaterials() {
+			Map<String, Integer> result = new HashMap<String, Integer>();
+			result.put(Material.FIRE_CHARGE.toString(), 5);
+			return result;
+		}
+    },;
 
     private Sound sound = Sound.INTENTIONALLY_EMPTY;
     private String description = "";
@@ -227,6 +259,7 @@ public enum PlayerClass {
 
     // Abstract method to get the action for each class
     abstract public PlayerAction getAction();
+    // Abstract method to get materials list to expose it on the instruction book
     abstract public Map<String, Integer> getMaterials();
 
 }

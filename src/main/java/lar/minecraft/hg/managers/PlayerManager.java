@@ -28,6 +28,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import lar.minecraft.hg.ServerSchedulers;
 import lar.minecraft.hg.SpigotPlugin;
 import lar.minecraft.hg.entities.PlayerExtra;
 import lar.minecraft.hg.enums.MessageKey;
@@ -44,7 +45,7 @@ public class PlayerManager implements Listener {
 		Player player = event.getPlayer();
 		event.setJoinMessage(null);
 		//Log player join on database
-		DatabaseManager.addPlayer(player);
+		DatabaseManager.addPlayerJoin(SpigotPlugin.serverId, ServerSchedulers.getCurentHGGameId(), player);
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby()) {
 			// Teleport each player to a random location 
 			Location spawnLocation = ServerManager.getSurfaceRandomLocation(30, SpigotPlugin.newSpawnLocation, 0, 2, 0);
@@ -143,16 +144,16 @@ public class PlayerManager implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event){
 		event.setQuitMessage(null);
+		Player player = event.getPlayer();
 		// Stop reproducing particles of the winner player
-		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(event.getPlayer().getUniqueId(), null);
+		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(player.getUniqueId(), null);
 		if (playerExtra != null && playerExtra.isLastWinner()) {
 			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
 		}
 		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby() || SpigotPlugin.isWinning()) { 
-			PlayerManager.playerExtras.remove(event.getPlayer().getUniqueId());
+			PlayerManager.playerExtras.remove(player.getUniqueId());
 		}
-		if (SpigotPlugin.isSafeArea() || SpigotPlugin.isPlaying() || SpigotPlugin.isWinning()) {
-			Player player = event.getPlayer();
+		if (!player.getGameMode().equals(GameMode.SPECTATOR) && (SpigotPlugin.isSafeArea() || SpigotPlugin.isPlaying() || SpigotPlugin.isWinning())) {
 			player.getWorld().strikeLightningEffect(player.getLocation());
 			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
 		}
@@ -192,7 +193,7 @@ public class PlayerManager implements Listener {
             if (entity == player) continue;
             
             Player foundPlayer = (Player)entity;
-            if (foundPlayer.getGameMode() == GameMode.SPECTATOR) continue;
+            if (foundPlayer.getGameMode().equals(GameMode.SPECTATOR)) continue;
             
             double distanceTo = player.getLocation().distance(foundPlayer.getLocation());
             if (distanceTo < distance) {

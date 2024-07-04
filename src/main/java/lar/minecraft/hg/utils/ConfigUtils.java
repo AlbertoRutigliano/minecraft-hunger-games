@@ -1,5 +1,7 @@
 package lar.minecraft.hg.utils;
 
+import java.util.List;
+
 import org.bukkit.configuration.file.FileConfiguration;
 
 import lar.minecraft.hg.enums.ConfigProperty;
@@ -26,5 +28,9 @@ public class ConfigUtils {
 	
 	public static String getString(ConfigProperty property) {
 		return config.getString(property.getKey(), (String) property.getDefaultValue());
+	}
+	
+	public static List<?> getList(ConfigProperty property) {
+		return config.getList(property.getKey(), (List<?>) property.getDefaultValue());
 	}
 }

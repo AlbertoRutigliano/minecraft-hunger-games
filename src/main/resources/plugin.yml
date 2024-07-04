@@ -48,6 +48,8 @@ commands:
           /<command> teleporter I'm here... not anymore
           /<command> barbarian WWOOWOWOW
           /<command> hardcore Are you crazy!?!?
+          /<command> chef Wanna eat some food? Yes, Rice and Chicken
+          /<command> exploder ..........BOOOOOM
 permissions:
    perm.general:
       default: true

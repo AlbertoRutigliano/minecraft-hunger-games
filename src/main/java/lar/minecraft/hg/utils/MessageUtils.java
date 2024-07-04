@@ -21,7 +21,7 @@ public class MessageUtils {
 	private static FileConfiguration languageConfig;
 	private static Logger logger;
 	
-    public static void init() {       
+    public static void init() {
     	logger = SpigotPlugin.getPlugin(SpigotPlugin.class).getLogger();
         // Load the language file
         File languageFile = new File(SpigotPlugin.getPlugin(SpigotPlugin.class).getDataFolder(), "messages.yml");

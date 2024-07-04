@@ -3,9 +3,7 @@ package lar.minecraft.hg;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Properties;
-
 import org.bukkit.Difficulty;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -94,10 +92,12 @@ public class SpigotPlugin extends JavaPlugin {
     	
     	// Initiate DB connection and connect to database
     	boolean databaseEnabled = ConfigUtils.getBoolean(ConfigProperty.database_enable);
-		String dbConnectionString = ConfigUtils.getString(ConfigProperty.database_connection_string); 
-		String dbUser = ConfigUtils.getString(ConfigProperty.database_user);
-		String dbPassword = ConfigUtils.getString(ConfigProperty.database_password);
-    	DatabaseManager.init(databaseEnabled, dbConnectionString, dbUser, dbPassword);
+    	if (databaseEnabled) {
+    		String dbConnectionString = ConfigUtils.getString(ConfigProperty.database_connection_string); 
+    		String dbUser = ConfigUtils.getString(ConfigProperty.database_user);
+    		String dbPassword = ConfigUtils.getString(ConfigProperty.database_password);
+        	DatabaseManager.init(this, dbConnectionString, dbUser, dbPassword);
+    	}
     	
         // Enable test commands
         getCommand(Cmd.start_hg).setExecutor(new TestCommand(this));
@@ -127,13 +127,7 @@ public class SpigotPlugin extends JavaPlugin {
     
     @Override
     public void onDisable() {
-    	try {
-			DatabaseManager.disconnectToDatabase();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	// Code to be executed when plugin is disabled
     }
     
     public static HGPhase getPhase() {
