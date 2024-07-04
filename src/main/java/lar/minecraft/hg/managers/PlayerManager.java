@@ -147,16 +147,20 @@ public class PlayerManager implements Listener {
 		Player player = event.getPlayer();
 		// Stop reproducing particles of the winner player
 		PlayerExtra playerExtra = PlayerManager.playerExtras.getOrDefault(player.getUniqueId(), null);
-		if (playerExtra != null && playerExtra.isLastWinner()) {
-			SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+		if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
+			if (playerExtra != null && playerExtra.isLastWinner()) {
+				SpigotPlugin.server.getScheduler().cancelTask(winnerParticleEffectTaskId);
+			}
+			if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby() || SpigotPlugin.isWinning() || SpigotPlugin.isEnded()) { 
+				PlayerManager.playerExtras.remove(player.getUniqueId());
+			}
+			if (SpigotPlugin.isSafeArea() || SpigotPlugin.isPlaying()) {
+				player.getWorld().strikeLightningEffect(player.getLocation());
+				ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
+				event.setQuitMessage(MessageUtils.getMessage(MessageKey.quit_message, player.getName()));
+			}
 		}
-		if (SpigotPlugin.isWaitingForStart() || SpigotPlugin.isLobby() || SpigotPlugin.isWinning()) { 
-			PlayerManager.playerExtras.remove(player.getUniqueId());
-		}
-		if (!player.getGameMode().equals(GameMode.SPECTATOR) && (SpigotPlugin.isSafeArea() || SpigotPlugin.isPlaying() || SpigotPlugin.isWinning())) {
-			player.getWorld().strikeLightningEffect(player.getLocation());
-			ServerManager.sendSound(Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-		}
+		
 	}
 	
 	/**

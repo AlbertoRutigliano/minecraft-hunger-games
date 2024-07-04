@@ -74,6 +74,8 @@ public class ServerSchedulers {
 		currentHGGameId = DatabaseManager.createHGGame(SpigotPlugin.serverId);
 		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, SpigotPlugin.getPhase().name());
 		
+		server.setIdleTimeout(0);
+		
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.setGameMode(GameMode.ADVENTURE);
 			p.getInventory().clear();
@@ -137,9 +139,13 @@ public class ServerSchedulers {
 	public static void safeAreaPhase() {
 		SpigotPlugin.setPhase(HGPhase.SAFE_AREA);
 		plugin.getLogger().info(SpigotPlugin.getPhase() + " phase");
+		
 		DatabaseManager.saveGamePhase(SpigotPlugin.serverId, currentHGGameId, SpigotPlugin.getPhase().name());
 		
 		safeAreaTime = 0;
+		
+		server.setIdleTimeout(Integer.valueOf(SpigotPlugin.serverProps.getProperty("player-idle-timeout")));
+		
 		// Notify all players that Hunger Games is starting
 		ServerManager.getLivingPlayers().forEach(p -> {
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(MessageUtils.getMessage(MessageKey.safe_area_phase_alert)));
@@ -196,7 +202,7 @@ public class ServerSchedulers {
 
 		worldBorderCollapseTime = 0;
 		winnerCelebrationsTime = 0;
-		server.setIdleTimeout(ConfigUtils.getInt(ConfigProperty.duration_idle_timeout));
+		
 		ServerManager.getLivingPlayers()
 			.forEach(p -> p.sendTitle(MessageUtils.getMessage(MessageKey.playing_phase_alert), null, 10, 100, 10));
 		

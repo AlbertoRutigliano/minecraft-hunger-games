@@ -30,5 +30,6 @@ public enum MessageKey {
 	scoreboard_list_third_row,
 	scoreboard_list_row,
 	current_player_location,
-	world_border_collapse_message;
+	world_border_collapse_message,
+	quit_message;
 }
