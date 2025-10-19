@@ -65,7 +65,7 @@ public class DatabaseManager {
 					  	+ " UNIQUE KEY players_uuid_IDX (uuid) USING BTREE"
 					  	+ " )"
 			  	,	"CREATE OR REPLACE"
-						+ " ALGORITHM = UNDEFINED VIEW v_Scoreboard AS ("
+						+ " ALGORITHM = UNDEFINED VIEW v_scoreboard AS ("
 						+ " select"
 						+ " players.uuid AS uuid,"
 						+ " players.name AS name,"
