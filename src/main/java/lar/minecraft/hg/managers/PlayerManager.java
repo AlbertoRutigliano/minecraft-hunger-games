@@ -58,7 +58,7 @@ public class PlayerManager implements Listener {
 			String lastWinner = DatabaseManager.getLastWinner(SpigotPlugin.serverId);
 			boolean isLastWinner = false;
 			
-			if (!lastWinner.isEmpty()) {
+			if (lastWinner != null && !lastWinner.isEmpty()) {
 				isLastWinner = player.getUniqueId().compareTo(UUID.fromString(lastWinner)) == 0 ? true : false;
 				if (isLastWinner) {
 					player.sendMessage(MessageUtils.getMessage(MessageKey.last_match_win));
